@@ -9,6 +9,7 @@ describe("Collation test", function()
     collator:load_ducet(content)
     ducet_file:close()
     assert.same(type(collator.keys), "table")
+    local sorted_table = {}
     -- local s = "příliš žluťoučký kůň úpěl ďábelské ódy"
     local s = "aábcčdďeéěfghchiíjklmnňoópqrřsštťuúůvwxyýzžAÁBCČDĎEÉĚFGHCHIÍJKLMNŇOÓPQRŘSŠTŤUÚŮVWXYÝZŽ"
     for _, codepoint in utf8.codes(s) do
@@ -22,8 +23,15 @@ describe("Collation test", function()
       for _, x in ipairs(values) do
         primary_keys[#primary_keys+1] = x[1]
       end
-      print(utf8.char(codepoint), table.concat(primary_keys, ";"))
+      sorted_table[#sorted_table+1] = {key = primary_keys[1], codepoint = codepoint}
+      -- print(utf8.char(codepoint), table.concat(primary_keys, ";"))
     end
+    table.sort(sorted_table, function(a,b) return a.key < b.key end)
+    local t = {}
+    for _, x in ipairs(sorted_table) do
+      t[#t+1] = utf8.char(x.codepoint) .. ":" ..  x.key ..";"
+    end
+    print(table.concat(t))
 
   end)
 end)
