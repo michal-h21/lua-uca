@@ -1,4 +1,4 @@
-local collation = require "luaindex.collation"
+local collation = require "tools.collation"
 
 describe("Collation test", function()
   local collator = collation.new()
