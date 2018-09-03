@@ -1,4 +1,4 @@
-all: data/allkeys.txt data/common 
+all: data/allkeys.txt data/common src/luaindex/ducet.lua
 
 data/allkeys.txt:
 	mkdir data
@@ -9,3 +9,6 @@ data/common:
 	wget http://unicode.org/Public/cldr/33/cldr-common-33.0.zip
 	unzip cldr-common-33.0.zip "common/collation/*" -d data/
 	rm cldr-common-33.0.zip
+
+src/luaindex/ducet.lua:
+	texlua tools/make_ducet.lua > src/luaindex/ducet.lua
