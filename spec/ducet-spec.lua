@@ -1,4 +1,5 @@
 local keys = require "luaindex.ducet"
+-- this loads the precompiled  ducet file 
 
 describe("Collation test", function()
   it("should load the DUCET file", function()
@@ -30,3 +31,5 @@ describe("Collation test", function()
 
   end)
 end)
+
+
