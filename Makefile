@@ -11,4 +11,5 @@ data/common:
 	rm cldr-common-33.0.zip
 
 src/luaindex/ducet.lua:
+	mkdir -p src/luaindex
 	texlua tools/make_ducet.lua > src/luaindex/ducet.lua
