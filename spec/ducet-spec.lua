@@ -20,8 +20,9 @@ describe("Collation test", function()
         primary_keys[#primary_keys+1] = x[1]
       end
       sorted_table[#sorted_table+1] = {key = primary_keys[1], codepoint = codepoint}
-      -- print(utf8.char(codepoint), table.concat(primary_keys, ";"))
+      print(utf8.char(codepoint), table.concat(primary_keys, ";"))
     end
+
     table.sort(sorted_table, function(a,b) return a.key < b.key end)
     local t = {}
     for _, x in ipairs(sorted_table) do
@@ -29,6 +30,12 @@ describe("Collation test", function()
     end
     print(table.concat(t))
 
+  end)
+  it("should compare strings", function()
+    -- test comparison using primary keys 
+    local a = keys[string.byte("a")].value[1][1]
+    local b = keys[string.byte("b")].value[1][1]
+    assert.truthy(a < b)
   end)
 end)
 
