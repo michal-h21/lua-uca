@@ -37,6 +37,11 @@ describe("Collation test", function()
     local b = keys[string.byte("b")].value[1][1]
     assert.truthy(a < b)
   end)
+  it("combined characters", function()
+    -- test for existence of sequence 0x006C 0x00B7
+    local l = keys[0x006C] --
+    assert.truthy(l.children[0x00B7])
+  end)
 end)
 
 
