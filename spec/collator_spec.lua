@@ -44,6 +44,10 @@ describe("collator test suite",function()
     assert.truthy(collator_obj:compare(abc, bbc))
     assert.truthy(collator_obj:compare(bbc,abc)==false)
     assert.truthy(collator_obj:compare(abc, abcd))
+    -- compare strings
+    --
+    assert.truthy(collator_obj:compare_strings("abc", "abcd"))
+
     -- try to sort a table
     local t = {"med", "Med", "dabing", "měď", "da capo", "ďábel", "zeď", "medvěd","motýlek", "kánon", "motýl noční", "ucho","kaňon", "úchop", "uchopit", "kanon", "kanón", "cáp", "čáp", "cep"}
     local cache = {}
@@ -65,4 +69,31 @@ describe("collator test suite",function()
     assert_smaller("ucho", "úchop")
 
   end)
+  it("should support tailoring", function()
+    local h = collator_obj:string_to_codepoints("h")
+    local ch = collator_obj:string_to_codepoints("ch")
+    local c = collator_obj:string_to_codepoints("c")
+    local ccaron = collator_obj:string_to_codepoints("č")
+    local r = collator_obj:string_to_codepoints("r")
+    local rcaron = collator_obj:string_to_codepoints("ř")
+    local s = collator_obj:string_to_codepoints("s")
+    local scaron = collator_obj:string_to_codepoints("š")
+    local z = collator_obj:string_to_codepoints("z")
+    local zcaron = collator_obj:string_to_codepoints("ž")
+    local tailoring_table = {1, 0, 0}
+    collator_obj:tailor(h, ch, tailoring_table)
+    collator_obj:tailor(c, ccaron, tailoring_table)
+    collator_obj:tailor(r, rcaron, tailoring_table)
+    collator_obj:tailor(s, scaron, tailoring_table)
+    collator_obj:tailor(z, zcaron, tailoring_table)
+    local t = {"cd", "be", "ce",  "cha", "ha","ie", "čáp", "dada", "rak", "řak", "se", "še", "te", "za", "ža"}
+    table.sort(t, function(a,b)
+      return collator_obj:compare_strings(a,b)
+    end)
+    for i, x in ipairs(t) do
+      print(x)
+    end
+
+  end)
+
 end)

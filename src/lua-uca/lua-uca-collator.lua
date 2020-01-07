@@ -6,8 +6,10 @@ collator.__index = collator
 
 function collator.new(codes)
   local self = setmetatable({}, collator)
-  -- table for 
+  -- tree with mappings from codepoints to collation elements
   self.codes = codes or {}
+  -- cached sort keys
+  self.stringcache = {}
   return self
 end
 
@@ -18,7 +20,8 @@ function collator:get_implicit_weight(codepoints, pos)
 end
 
 function collator:read_weight(codepoints, pos)
-  -- try to find contractions
+  -- try to find contractions and return weight for longest matched string
+  -- in the database
   local function read_children(parent, pos)
     local children = parent.children or {}
     local newpos = pos + 1
@@ -107,5 +110,58 @@ function collator:compare(a, b)
   -- "invalid order function for sorting" error
   return #a < #b
 end
+
+function collator:string_to_codepoints(a)
+  local codepoints = {}
+  for _, code in utf8.codes(a) do codepoints[#codepoints+1] = code end
+  return codepoints
+end
+
+function collator:compare_strings(a,b)
+  -- sort using strings
+  local cache = self.stringcache
+  local get_sortkey = function(x) return self:make_sort_key(self:string_to_codepoints(x)) end
+  local asortkey = cache[a] or get_sortkey(a)
+  local bsortkey = cache[b] or get_sortkey(b)
+  cache[a], cache[b] = asortkey, bsortkey
+  return self:compare(asortkey, bsortkey)
+end
+
+-- update collation codes
+function collator:update_codes(key, elements)
+  local keys = self.codes
+  local function add_to_tree(tbl, current_pos)
+    local tbl = tbl or {}
+    local current_key = key[current_pos]
+    local el =  tbl[current_key] or {}
+    if current_pos < #key then
+      el.children = add_to_tree(el.children, current_pos + 1)
+    elseif current_pos == #key then
+      el.value = elements
+    end
+    tbl[current_key] = el
+    return tbl
+  end
+  keys = add_to_tree(keys, 1)
+end
+
+
+--- change sorting ordering
+-- 
+function collator:tailor(base, target, tailoring_table)
+  -- get the value of the base character
+  local value = self:get_weights(base, 1)
+  local new_value = {}
+  --  create a new collation element
+  for k, v in ipairs(value) do
+    local subtable = {}
+    for x, y in ipairs(v) do
+      subtable[x] = y + tailoring_table[x]
+    end
+    new_value[k] = subtable
+  end
+  self:update_codes(target, new_value)
+end
+
 
 return collator
