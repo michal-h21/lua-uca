@@ -103,6 +103,8 @@ function collator:compare(a, b)
     if a[i] ~= b[i] then return a[i] < b[i] end
   end
   -- this should happen only when the strings are equal
+  -- it needs to return false, otherwise the table.sort function reports
+  -- "invalid order function for sorting" error
   return #a < #b
 end
 
