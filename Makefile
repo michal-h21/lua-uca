@@ -1,4 +1,4 @@
-all: data/allkeys.txt data/common src/luaindex/ducet.lua
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua
 
 data/allkeys.txt:
 	mkdir data
@@ -10,6 +10,6 @@ data/common:
 	unzip cldr-common-33.0.zip "common/collation/*" -d data/
 	rm cldr-common-33.0.zip
 
-src/luaindex/ducet.lua:
-	mkdir -p src/luaindex
-	texlua tools/make_ducet.lua > src/luaindex/ducet.lua
+src/lua-uca/lua-uca-ducet.lua:
+	mkdir -p src/lua-uca
+	texlua tools/make_ducet.lua > src/lua-uca/lua-uca-ducet.lua

@@ -1,4 +1,4 @@
-local keys = require "luaindex.ducet"
+local keys = require "lua-uca.lua-uca-ducet"
 -- this loads the precompiled  ducet file 
 
 describe("Collation test", function()
