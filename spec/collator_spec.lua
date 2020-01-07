@@ -33,12 +33,36 @@ describe("collator test suite",function()
     assert.truthy(#sort_key, 2 * 3 + 3)
   end)
   it("should compare strings", function()
-    local get_sortkey = function(a) return collator_obj:make_sort_key(utf8.codes(a)) end
+    local get_sortkey = function(a) 
+      local codepoints = {}
+      for _, code in utf8.codes(a) do codepoints[#codepoints+1] = code end
+      return collator_obj:make_sort_key(codepoints) 
+    end
     local abc = get_sortkey("abc")
     local bbc = get_sortkey("bbc")
     local abcd = get_sortkey("abcd")
-    print(collator_obj:compare(abc, bbc))
-    print(collator_obj:compare(abc, abcd))
+    assert.truthy(collator_obj:compare(abc, bbc))
+    assert.truthy(collator_obj:compare(bbc,abc)==false)
+    assert.truthy(collator_obj:compare(abc, abcd))
+    -- try to sort a table
+    local t = {"med", "Med", "dabing", "měď", "da capo", "ďábel", "zeď", "medvěd","motýlek", "kánon", "motýl noční", "ucho","kaňon", "úchop", "uchopit", "kanon", "kanón", "cáp", "čáp", "cep"}
+    local cache = {}
+    table.sort(t, function(a,b)
+      local asortkey = cache[a] or get_sortkey(a)
+      local bsortkey = cache[b] or get_sortkey(b)
+      cache[a], cache[b] = asortkey, bsortkey
+      return collator_obj:compare(asortkey, bsortkey)
+    end)
+    local reverse_table = {}
+    for i, x in ipairs(t) do 
+      -- this will enable us to test position of words in the sorted table
+      reverse_table[x] = i
+      print(x) 
+    end
+    local function assert_smaller(a, b) assert.truthy(reverse_table[a] < reverse_table[b]) end
+    assert_smaller("měď", "medvěd")
+    assert_smaller("da capo", "ďábel")
+    assert_smaller("ucho", "úchop")
 
   end)
 end)
