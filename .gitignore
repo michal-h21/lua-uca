@@ -1,0 +1,3 @@
+*.swp
+data/
+src/lua-uca/lua-uca-ducet.lua
