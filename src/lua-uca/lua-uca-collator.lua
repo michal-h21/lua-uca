@@ -102,7 +102,8 @@ function collator:compare(a, b)
   for i = 1, min do 
     if a[i] ~= b[i] then return a[i] < b[i] end
   end
-  return 0
+  -- this should happen only when the strings are equal
+  return #a < #b
 end
 
 return collator
