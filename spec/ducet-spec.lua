@@ -37,10 +37,21 @@ describe("Collation test", function()
     local b = keys[string.byte("b")].value[1][1]
     assert.truthy(a < b)
   end)
-  it("combined characters", function()
+  it("contracted characters", function()
     -- test for existence of sequence 0x006C 0x00B7
     local l = keys[0x006C] --
     assert.truthy(l.children[0x00B7])
+  end)
+  it("supports contractions of  more than two letters", function()
+     local x = keys[0x0FB2] 
+     local y = x.children[0x0F71]
+     -- y shouldn't have values, there is no contraction for 0x0FB2 and 0x0F71
+     assert.truthy(y.value == nil)
+     -- there should be another child
+     local d = y.children[0x0F80]
+     assert.truthy(d)
+     -- it should have value
+     assert.truthy(d.value)
   end)
 end)
 
