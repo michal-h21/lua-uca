@@ -1,4 +1,6 @@
--- object for 
+-- object for Unicode string collation
+local math = require "math"
+
 local collator = {}
 collator.__index = collator
 
@@ -92,6 +94,15 @@ function collator:make_sort_key(codepoints)
     table.insert(sort_key, 0)
   end
   return sort_key
+end
+
+function collator:compare(a, b)
+  -- sort using sort keys
+  local min = math.min(#a, #b)
+  for i = 1, min do 
+    if a[i] ~= b[i] then return a[i] < b[i] end
+  end
+  return 0
 end
 
 return collator

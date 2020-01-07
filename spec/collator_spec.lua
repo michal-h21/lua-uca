@@ -32,4 +32,13 @@ describe("collator test suite",function()
     -- assert two collation elements * 3 levels + 3 separator zeroes (there is one trailing at the end of the sort key)
     assert.truthy(#sort_key, 2 * 3 + 3)
   end)
+  it("should compare strings", function()
+    local get_sortkey = function(a) return collator_obj:make_sort_key(utf8.codes(a)) end
+    local abc = get_sortkey("abc")
+    local bbc = get_sortkey("bbc")
+    local abcd = get_sortkey("abcd")
+    print(collator_obj:compare(abc, bbc))
+    print(collator_obj:compare(abc, abcd))
+
+  end)
 end)
