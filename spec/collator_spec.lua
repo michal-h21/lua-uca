@@ -49,7 +49,7 @@ describe("collator test suite",function()
     assert.truthy(collator_obj:compare_strings("abc", "abcd"))
 
     -- try to sort a table
-    local t = {"med", "Med", "dabing", "měď", "da capo", "ďábel", "zeď", "medvěd","motýlek", "kánon", "motýl noční", "ucho","kaňon", "úchop", "uchopit", "kanon", "kanón", "cáp", "čáp", "cep"}
+    local t = {"med", "Med", "dabing",  "měď", "da capo", "ďábel", "zeď", "medvěd","motýlek", "kánon", "motýl noční", "ucho","kaňon", "úchop", "uchopit", "kanon", "kanón", "cáp", "čáp", "cep"}
     local cache = {}
     table.sort(t, function(a,b)
       local asortkey = cache[a] or get_sortkey(a)
@@ -86,7 +86,7 @@ describe("collator test suite",function()
     collator_obj:tailor(r, rcaron, tailoring_table)
     collator_obj:tailor(s, scaron, tailoring_table)
     collator_obj:tailor(z, zcaron, tailoring_table)
-    local t = {"cd", "be", "ce",  "cha", "ha","ie", "čáp", "dada", "rak", "řak", "se", "še", "te", "za", "ža"}
+    local t = {"cd", "be", "ce", "zbla", "cha", "ha","ie", "čáp", "dada", "rak", "řak", "se", "še", "te", "za", "ža"}
     table.sort(t, function(a,b)
       return collator_obj:compare_strings(a,b)
     end)
