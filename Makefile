@@ -13,3 +13,10 @@ data/common:
 src/lua-uca/lua-uca-ducet.lua:
 	mkdir -p src/lua-uca
 	texlua tools/make_ducet.lua > src/lua-uca/lua-uca-ducet.lua
+
+.PHONY: test
+
+test:
+	busted spec/ducet-spec.lua
+	busted spec/collator_spec.lua
+
