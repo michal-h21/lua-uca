@@ -10,6 +10,7 @@ function collator.new(codes)
   self.codes = codes or {}
   -- cached sort keys
   self.stringcache = {}
+  self.tailoring_multiplier = {1, 1, 1, 1}
   return self
 end
 
@@ -156,11 +157,39 @@ function collator:tailor(base, target, tailoring_table)
   for k, v in ipairs(value) do
     local subtable = {}
     for x, y in ipairs(v) do
-      subtable[x] = y + tailoring_table[x]
+      subtable[x] = y + ((tailoring_table[x] or 0) * self.tailoring_multiplier[x] or 1)
     end
     new_value[k] = subtable
   end
   self:update_codes(target, new_value)
+end
+
+-- sort uppercase first
+function collator:uppercase_first()
+  -- table with values for uppercase
+  local uppercase_values = {0x08, 0x09, 0xA, 0xB, 0x0C, 0x0E, 0x11, 0x12, 0x1D}
+  local is_uppercase = {}
+  -- we must invert tertiary element in tailoring
+  self.tailoring_multiplier[3] = -1
+  for k,v in ipairs(uppercase_values) do is_uppercase[v] = true end
+  
+  local function change_case(element)
+    local value =  element.value or {}
+    for _, collation_element in ipairs(value) do
+      -- detect if the tertiary element is uppercase
+      local third = collation_element[3]
+      -- make new collation element and insert it before the tertiary element
+      local case = is_uppercase[third] and 1 or 3
+      table.insert(collation_element, 3, case)
+    end
+    -- recursivelly process children
+    local children = element.children or {}
+    for _, child in ipairs(children) do change_case(child) end
+  end
+  for _, element in pairs(self.codes) do
+    change_case(element)
+  end
+
 end
 
 
