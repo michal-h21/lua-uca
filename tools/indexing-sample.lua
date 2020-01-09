@@ -8,7 +8,7 @@ kpse.set_program_name "luatex"
 local ieclib = require "ieclib"
 
 local collator_obj = collator.new(ducet)
-collator_obj = languages.cs(collator_obj)
+collator_obj = languages.no(collator_obj)
 ieclib.load_enc{"T1", "T2A", "T2B", "T2C", "T3", "T5", "LGR"}
 local function parse_index_entries(text)
   local indexentries = {}
