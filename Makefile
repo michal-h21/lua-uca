@@ -19,4 +19,5 @@ src/lua-uca/lua-uca-ducet.lua:
 test:
 	busted spec/ducet-spec.lua
 	busted spec/collator_spec.lua
+	busted spec/languages-spec.lua
 
