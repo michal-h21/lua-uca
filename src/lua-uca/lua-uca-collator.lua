@@ -164,6 +164,21 @@ function collator:tailor(base, target, tailoring_table)
   self:update_codes(target, new_value)
 end
 
+-- expand characters to another characters
+function collator:equal(base, target)
+  local new_weight = {}
+  local values, pos 
+  pos = 1
+  while true do
+    value, pos = self:get_weights(target, pos)
+    for _, v in ipairs(value) do 
+      new_weight[#new_weight + 1] = v 
+    end
+    if not pos then break end
+  end
+  self:update_codes(base, new_weight)
+end
+
 -- sort uppercase first
 function collator:uppercase_first()
   -- table with values for uppercase
