@@ -4,6 +4,9 @@ local secondary_tailoring = {0, 1, 0}
 local tertiary_tailoring = {0, 0, 1}
 local equal_tailoring= {0, 0, 0}
 
+local function equal_string(collator_obj,base, target)
+  collator_obj:equal(collator_obj:string_to_codepoints(base), collator_obj:string_to_codepoints(target))
+end
 
 local function tailor_string(collator_obj, str)
   -- cupport the cldr strings in the form: &D<<đ<<<Đ<<ð<<<Ð
@@ -15,13 +18,15 @@ local function tailor_string(collator_obj, str)
     local butf = collator_obj:string_to_codepoints(b)
     collator_obj:tailor(autf,butf, tbl) 
   end
+  local function tailor_equal(base, target)
+    equal_string(collator_obj, base, target)
+  end
   local function tailor_primary(a,b) tailor(a,b, tailoring_table) end
   local function tailor_secondary(a,b) tailor(a,b, secondary_tailoring) end
   local function tailor_tertiary(a,b) tailor(a,b, tertiary_tailoring) end
-  local function tailor_equal(a,b) tailor(a,b, equal_tailoring) end
   local functions = {["<"] = tailor_primary, ["<<"] = tailor_secondary, ["<<<"] = tailor_tertiary, ["="] = tailor_equal}
-  local first = str:match("^&?([^%<]+)")
-  for fn, second in str:gmatch("([<=]+)([^<]+)") do
+  local first = str:match("^&?([^%<^%=]+)")
+  for fn, second in str:gmatch("([<=]+)([^<^%=]+)") do
     local exec = functions[fn]
     exec(first, second)
     first = second -- set the current second object as first for the next round
@@ -71,15 +76,11 @@ languages.de_din2 = function(collator_obj)
   end
   local tailoring = function(s) tailor_string(collator_obj, s) end
   languages.de(collator_obj)
-  -- tailoring "Ö=Oe"
-  -- tailoring "ö=oe"
-
-  -- this doesn't really work
-  tailor("Ö", "Oe", {0, 0, 0})
-  tailor("ö", "oe", {0, 0, 0})
+  tailoring "&Ö=Oe"
+  tailoring "&ö=oe"
   return collator_obj
 end
 
 
 
-  return languages
+return languages
