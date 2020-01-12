@@ -1,4 +1,11 @@
+TEXMFHOME = $(shell kpsewhich -var-value=TEXMFHOME)
+INSTALL_DIR = ${TEXMFHOME}/scripts/lua/lua-uca/
+LUA_DIR = src/lua-uca/
+
+
 all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua
+
+
 
 data/allkeys.txt:
 	mkdir data
@@ -14,10 +21,14 @@ src/lua-uca/lua-uca-ducet.lua:
 	mkdir -p src/lua-uca
 	texlua tools/make_ducet.lua > src/lua-uca/lua-uca-ducet.lua
 
-.PHONY: test
+.PHONY: test install
 
 test:
 	busted spec/ducet-spec.lua
 	busted spec/collator_spec.lua
 	busted spec/languages-spec.lua
+
+install: 
+	mkdir -p ${INSTALL_DIR}
+	cp ${LUA_DIR}*.lua ${INSTALL_DIR}
 
