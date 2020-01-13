@@ -272,6 +272,7 @@ function collator:uppercase_first()
   local is_uppercase = {}
   -- we must invert tertiary element in tailoring
   self.tailoring_multiplier[3] = -1
+  self.is_uppercase_first = true
   for k,v in ipairs(uppercase_values) do is_uppercase[v] = true end
   
   local function change_case(element)
