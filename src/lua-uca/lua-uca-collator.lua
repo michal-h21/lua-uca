@@ -98,13 +98,47 @@ end
 -- get characters with lowest weight at the given point of the codepoint array
 -- useful for index header strings
 function collator:get_lowest_char(codepoints, pos)
+  -- find the lowest key in the table
+  local min = math.min
+  local max = math.max
+  local minimal = 0xffffffffff
+  local maximal = -0xfffffffff
+  local function get_lowest_key(tbl)
+    local minimal, maximal = minimal, maximal
+    if tbl.minimal then return tbl.minimal, tbl.maximal end
+    for k,v in pairs(tbl) do 
+      minimal,maximal = min(k, minimal), max(k, maximal)
+    end
+    tbl.minimal, tbl.maximal = minimal, maximal
+    return minimal, maximal
+  end
+
+  -- traverse tree, select lowest keys and find the codepoints
+  local function find_codepoints(tbl, level)
+    local level = level or 1
+    local tbl = tbl or {}
+    if tbl.codepoints then return tbl.codepoints end
+    local newmin, newmax = get_lowest_key(tbl)
+    -- this shouldn't happen
+    if newmin == minimal then return nil end
+    -- if the collation is set to upperace first, then the lowest character has the hightest
+    -- collation value
+    if self.is_uppercase_first and level == 2 then
+      newmin = newmax
+    end
+    return find_codepoints(tbl[newmin], level + 1)
+  end
+
+
   local weights, next_pos = self:read_weight(codepoints, pos)
   local weight_to_char = self.weight_to_char or self:weight_to_codepoints()
-  for k, v in pairs(weight_to_char) do print(k) end
+  self.weight_to_char = weight_to_char
+  -- find the primary weight of the matched character
   local first = weights[1][1]
   local current = weight_to_char[first]
-  print(first, current)
-
+  -- traverse the tree to find the codepoint with the lowest weight
+  local x = find_codepoints(current)
+  return x
 end
 
 function collator:update_levels(levels, weights)
