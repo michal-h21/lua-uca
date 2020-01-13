@@ -25,21 +25,20 @@ describe("Test language support", function()
     assert.truthy(zcaronweight.value[1][1] - zweight.value[1][1] == 1)
   end)
   it("should find codepoints from weight", function()
-    -- czech = languages.cs(czech)
-    local codepoints = {}
-    for _, code in utf8.codes("Chrobák") do codepoints[#codepoints+1] = code end
+    local codepoints = czech:string_to_codepoints("Chrobák")
     local first_char = czech:get_lowest_char(codepoints, 1)
     assert.truthy(utf8.char(table.unpack(first_char)) == "ch")
   end)
   it("should find codepoints from weight for norwegian", function()
-    -- czech = languages.cs(czech)
     local norsk = collator.new(ducet)
     languages.no(norsk)
     
-    local codepoints = {}
-    for _, code in utf8.codes("åkerhane") do codepoints[#codepoints+1] = code end
+    local codepoints = norsk:string_to_codepoints("åkerhane")
     local first_char = norsk:get_lowest_char(codepoints, 1)
     assert.truthy(utf8.char(table.unpack(first_char)) == "å")
+    print(utf8.char(table.unpack(first_char)))
+    local first = norsk:read_weight(norsk:string_to_codepoints("lala"),1)
+
 
   end)
 
