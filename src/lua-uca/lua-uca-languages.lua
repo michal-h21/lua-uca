@@ -54,7 +54,7 @@ languages.no = function(collator_obj)
   tailoring("&th<<<þ")
   tailoring("&TH<<<Þ")
   tailoring("&Y<<ü<<<Ü<<ű<<<Ű")
-  tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<Ø<<<ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
+  tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
   tailoring("&oe<<œ<<<Œ")
   return collator_obj
 end
