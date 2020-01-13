@@ -14,6 +14,38 @@ function collator.new(codes)
   return self
 end
 
+-- make tree that points weights back to codepoints
+function collator:weight_to_codepoints(codes)
+  local weights = {}
+  local codes = codes or self.codes
+
+  local function insert_weight(element, codepoints)
+    local values = element.value
+    if values and not element.equal then
+      values = values[1]
+      local current = weights
+      for i, weight in ipairs(values) do
+        local new = current[weight] or {}
+        if i == #values then
+          new.codepoints = codepoints
+        end
+        current[weight] = new
+        current = new
+      end
+    end
+    for codepoint, element in ipairs(element.children or {}) do
+      -- make copy of the codes table, so the new codepoints are not added indefinitely
+      local newcodes = {table.unpack(codes)}
+      newcodes[#newcodes + 1] = codepoint
+      insert_weight(element, newcodes)
+    end
+  end
+  for codepoint, element in pairs(codes) do
+    insert_weight(element, {codepoint})
+  end
+  return weights
+end
+
 function collator:get_implicit_weight(codepoints, pos)
   -- implicit weight is based on the codepoint value
   local codepoint = codepoints[pos]
@@ -60,6 +92,18 @@ function collator:get_weights(codepoints, pos)
   return weights, next_pos
 end
 
+-- get characters with lowest weight at the given point of the codepoint array
+-- useful for index header strings
+function collator:get_lowest_char(codepoints, pos)
+  local weights, next_pos = self:read_weight(codepoints, pos)
+  local weight_to_char = self.weight_to_char or self:weight_to_codepoints()
+  for k, v in pairs(weight_to_char) do print(k) end
+  local first = weights[1][1]
+  local current = weight_to_char[first]
+  print(first, current)
+
+end
+
 function collator:update_levels(levels, weights)
   -- process weight weights
   for _, w in ipairs(weights) do
@@ -75,6 +119,7 @@ function collator:update_levels(levels, weights)
   end
   return levels
 end
+
 
 
 -- make sort key from codepoints array (it can be created using the utf8.codes() function
