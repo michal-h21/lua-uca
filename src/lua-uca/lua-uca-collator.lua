@@ -243,6 +243,10 @@ function collator:tailor(base, target, tailoring_table)
     end
     new_value[k] = subtable
   end
+  -- when tailoring sets an equivialent character, it needs to be ignored in collator:weight_to_codepoints
+  local is_equivalent = 0
+  for _, x in ipairs(tailoring_table) do is_equivalent = is_equivalent + x end
+  if is_equivalent == 0 then new_value.equal = true end
   self:update_codes(target, new_value)
 end
 
