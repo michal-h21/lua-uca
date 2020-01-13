@@ -24,4 +24,9 @@ describe("Test language support", function()
     local zweight, zcaronweight = czech.codes[z], czech.codes[zcaron]
     assert.truthy(zcaronweight.value[1][1] - zweight.value[1][1] == 1)
   end)
+  it("should find codepoints from weight", function()
+    local codepoints = {}
+    for _, code in utf8.codes("chochol") do codepoints[#codepoints+1] = code end
+    local first_char = czech:get_lowest_char(codepoints, 1)
+  end)
 end)
