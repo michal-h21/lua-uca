@@ -3,8 +3,8 @@ local collator = require "lua-uca.lua-uca-collator"
 local languages = require "lua-uca.lua-uca-languages"
 
 describe("Test language support", function()
+  local czech = collator.new(ducet)
   it("should  support language setting", function()
-    local czech = collator.new(ducet)
     ccaron = utf8.codepoint("č") 
     local cweight = czech.codes[ccaron]
     -- save primary weight before language rules have been applied
@@ -15,7 +15,13 @@ describe("Test language support", function()
     -- primary weight with new rules
     local second = cweight.value[1][1]
     assert.truthy(first < second)
-    
-
+  end)
+  it("should support the tailoring dsl", function()
+    -- test tailoring dsl
+    --
+    languages.tailor_string(czech,"&z<ž")
+    local z, zcaron = utf8.codepoint("z"), utf8.codepoint("ž")
+    local zweight, zcaronweight = czech.codes[z], czech.codes[zcaron]
+    assert.truthy(zcaronweight.value[1][1] - zweight.value[1][1] == 1)
   end)
 end)
