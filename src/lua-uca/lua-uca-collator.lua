@@ -19,29 +19,32 @@ function collator:weight_to_codepoints(codes)
   local weights = {}
   local codes = codes or self.codes
 
-  local function insert_weight(element, codepoints)
+  local function insert_weight(element, codepoints, weights)
     local values = element.value
-    if values and not element.equal then
+    local weights = weights
+    if values and not values.equal then
       values = values[1]
       local current = weights
       for i, weight in ipairs(values) do
         local new = current[weight] or {}
-        if i == #values then
+        -- multiple characters can have the same weight.
+        if i == #values and not new.codepoints then
           new.codepoints = codepoints
         end
         current[weight] = new
         current = new
       end
     end
-    for codepoint, element in ipairs(element.children or {}) do
+    local children = element.children or {}
+    for codepoint, element in pairs(children) do
       -- make copy of the codes table, so the new codepoints are not added indefinitely
-      local newcodes = {table.unpack(codes)}
+      local newcodes = {table.unpack(codepoints)}
       newcodes[#newcodes + 1] = codepoint
-      insert_weight(element, newcodes)
+      insert_weight(element, newcodes, weights)
     end
   end
   for codepoint, element in pairs(codes) do
-    insert_weight(element, {codepoint})
+    insert_weight(element, {codepoint}, weights)
   end
   return weights
 end
