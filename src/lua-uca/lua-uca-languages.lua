@@ -33,6 +33,8 @@ local function tailor_string(collator_obj, str)
   end
 end
 
+languages.tailor_string = tailor_string
+
 
 
 languages.cs = function(collator_obj)
