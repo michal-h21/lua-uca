@@ -41,7 +41,7 @@ The output:
 > chochol
 > jasan
 
-More samples of use can be found in the `test` directory. `tools/indexing-sample.lua` is a simple indexing processor.
+More samples of use can be found in the `spec` directory. `tools/indexing-sample.lua` is a simple indexing processor.
 
 ## Change sorting rules
 
@@ -77,4 +77,12 @@ It is also possible to expand a letter to multiple letters, like this example fo
     tailoring "&Ö=Oe"
     tailoring "&ö=oe"
 
+The `data/common/collation/` directory contains files from the `CLDR` project.
+They contain rules for many languages. The files needs to be normalized to the
+[NFC form](https://en.wikipedia.org/wiki/Unicode_equivalence), for example
+using:
+
+    cat cs.xml | uconv -x any-nfc -o cs.xml
+
+The `uconv` utility is a part of the [ICU Project](http://userguide.icu-project.org/).
 
