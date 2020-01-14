@@ -37,7 +37,35 @@ describe("Test language support", function()
     local first_char = norsk:get_lowest_char(codepoints, 1)
     assert.truthy(utf8.char(table.unpack(first_char)) == "å")
     print(utf8.char(table.unpack(first_char)))
-    local first = norsk:read_weight(norsk:string_to_codepoints("lala"),1)
+    local weights = norsk:read_weight(norsk:string_to_codepoints("lala"),1)
+    local first = weights[1][1]
+    local current = norsk.weight_to_char[first]
+    local function traverse(first, level) 
+      local level = level or 0
+      local indent = string.rep(".", level)
+      local first = first or {}
+      for k,v in pairs(first) do
+        if type(k) == "number" then
+          print(indent .. k)
+          if type(v) == "table" then
+            if v.codepoints then
+              print(indent .. "." .. utf8.char(table.unpack(v.codepoints)))
+            end
+            traverse(v, level + 1)
+          end
+        else
+          -- print(indent .. ".wtf k?", v)
+        end
+      end
+
+    end
+    
+    traverse(current)
+
+    local codepoints = norsk:string_to_codepoints("lala")
+    local first_char = norsk:get_lowest_char(codepoints, 1)
+    print(utf8.char(table.unpack(first_char)))
+
 
 
   end)
