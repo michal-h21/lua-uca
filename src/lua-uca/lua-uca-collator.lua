@@ -286,7 +286,9 @@ function collator:uppercase_first()
     end
     -- recursivelly process children
     local children = element.children or {}
-    for _, child in ipairs(children) do change_case(child) end
+    for x, child in pairs(children) do 
+      change_case(child) 
+    end
   end
   for _, element in pairs(self.codes) do
     change_case(element)
