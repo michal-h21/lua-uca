@@ -27,15 +27,20 @@ describe("Test language support", function()
   it("should find codepoints from weight", function()
     local codepoints = czech:string_to_codepoints("Chrobák")
     local first_char = czech:get_lowest_char(codepoints, 1)
-    assert.truthy(utf8.char(table.unpack(first_char)) == "ch")
+    assert.same(utf8.char(table.unpack(first_char)), "ch")
+    local first_char = czech:get_lowest_char(codepoints, 6)
+    assert.same(utf8.char(table.unpack(first_char)), "a")
+    -- č has distinct sort weight to c
+    local codepoints = czech:string_to_codepoints("čáp")
+    local first_char = czech:get_lowest_char(codepoints, 1)
+    assert.same(utf8.char(table.unpack(first_char)), "č")
   end)
   it("should find codepoints from weight for norwegian", function()
     local norsk = collator.new(ducet)
     languages.no(norsk)
-    
     local codepoints = norsk:string_to_codepoints("åkerhane")
     local first_char = norsk:get_lowest_char(codepoints, 1)
-    assert.truthy(utf8.char(table.unpack(first_char)) == "å")
+    assert.same(utf8.char(table.unpack(first_char)), "å")
 
   end)
 
