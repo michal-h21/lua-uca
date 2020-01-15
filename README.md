@@ -1,4 +1,4 @@
-# The `lua-uca` package
+# The `Lua-UCA` package
 
 This package adds support for the [Unicode collation algorithm](https://unicode.org/reports/tr10/) for Lua 5.3. 
 
@@ -41,7 +41,10 @@ The output:
 > chochol
 > jasan
 
-More samples of use can be found in the `spec` directory. `tools/indexing-sample.lua` is a simple indexing processor.
+More samples of use can be found in the `spec` directory.
+`tools/indexing-sample.lua` is a simple indexing processor. [Here is an
+example](https://tex.stackexchange.com/a/524014/2891) use of Lua-UCA with
+Xindex indexing processor.
 
 ## Change sorting rules
 
@@ -77,6 +80,17 @@ It is also possible to expand a letter to multiple letters, like this example fo
     tailoring "&Ö=Oe"
     tailoring "&ö=oe"
 
+Some languages, like Norwegian sort uppercase letters before lowercase. This can be enabled using `collator:uppercase_first()` function:
+
+    local tailoring = function(s) languages.tailor_string(collator_obj, s) end
+    collator_obj:uppercase_first()
+    tailoring("&D<<đ<<<Đ<<ð<<<Ð")
+    tailoring("&th<<<þ")
+    tailoring("&TH<<<Þ")
+    tailoring("&Y<<ü<<<Ü<<ű<<<Ű")
+    tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
+    tailoring("&oe<<œ<<<Œ")
+
 The `data/common/collation/` directory contains files from the `CLDR` project.
 They contain rules for many languages. The files needs to be normalized to the
 [NFC form](https://en.wikipedia.org/wiki/Unicode_equivalence), for example
@@ -86,3 +100,9 @@ using:
 
 The `uconv` utility is a part of the [ICU Project](http://userguide.icu-project.org/).
 
+# What is missing
+
+- Tailorings for most languages.
+- There is currently no support for reordering of sorting character groups such as digits or specific scripts. 
+- Algorithm for setting implicit sort weights of characters that are not explicitly listed in DUCET.
+- Special handling of CJK scripts.
