@@ -41,6 +41,11 @@ describe("Test language support", function()
     local codepoints = norsk:string_to_codepoints("åkerhane")
     local first_char = norsk:get_lowest_char(codepoints, 1)
     assert.same(utf8.char(table.unpack(first_char)), "å")
+    -- the rules from different collator objects shouldn't have an effect
+    -- Ch has distinct sort weight in Czech
+    local codepoints = norsk:string_to_codepoints("Chrobák")
+    local first_char = norsk:get_lowest_char(codepoints, 1)
+    assert.same(utf8.char(table.unpack(first_char)), "c")
 
   end)
 

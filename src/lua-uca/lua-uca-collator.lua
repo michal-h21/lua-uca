@@ -4,10 +4,22 @@ local math = require "math"
 local collator = {}
 collator.__index = collator
 
+local function copy_table(tbl)
+  local t = {}
+  for  k, v in pairs(tbl) do
+    if type(v) == "table" then
+      t[k] = copy_table(v)
+    else
+      t[k] = v
+    end
+  end
+  return t
+end
+
 function collator.new(codes)
   local self = setmetatable({}, collator)
   -- tree with mappings from codepoints to collation elements
-  self.codes = codes or {}
+  self.codes = copy_table(codes or {})
   -- cached sort keys
   self.stringcache = {}
   self.tailoring_multiplier = {1, 1, 1, 1}
