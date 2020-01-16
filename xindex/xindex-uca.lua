@@ -77,7 +77,9 @@ indexheader = {
 -- support reordering of the entries
 
 orders = {
-  cs = {"other", "digits"}
+  cs = {"other", "digits"},
+  ru = {"cyrillic", "other"}
+
 }
 
 function makeOrderingCategories(language)
