@@ -47,7 +47,8 @@ languages.cs = function(collator_obj)
   return collator_obj
 end
 
-languages.no = function(collator_obj)
+
+languages.da = function(collator_obj)
   local tailoring = function(s) tailor_string(collator_obj, s) end
   collator_obj:uppercase_first()
   tailoring("&D<<đ<<<Đ<<ð<<<Ð")
@@ -83,6 +84,17 @@ languages.de_din2 = function(collator_obj)
   return collator_obj
 end
 
+languages.no = function(collator_obj)
+  local tailoring = function(s) tailor_string(collator_obj, s) end
+  collator_obj:uppercase_first()
+  tailoring("&D<<đ<<<Đ<<ð<<<Ð")
+  tailoring("&th<<<þ")
+  tailoring("&TH<<<Þ")
+  tailoring("&Y<<ü<<<Ü<<ű<<<Ű")
+  tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
+  tailoring("&oe<<œ<<<Œ")
+  return collator_obj
+end
 
 
 return languages
