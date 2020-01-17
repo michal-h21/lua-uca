@@ -48,7 +48,7 @@ More samples of use can be found in the `spec` directory.
 
 [Xindex](https://www.ctan.org/pkg/xindex) is flexible index processor written in Lua by Herbert Voß. It supports Lua configuration files, which enables use of Lua-UCA for sorting of the index entries, as shown in [this example](https://tex.stackexchange.com/a/524014/2891) for Norwegian text.
 
-The `xindex` directory contains more advanced version of such configuration file together with several examples. Run the `make` command in the `xindex` directory to compile them.
+The `xindex` directory contains more advanced version of such configuration file together with several examples. Run `make xindex` command to compile them.
 
 ## Change sorting rules
 

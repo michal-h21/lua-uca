@@ -3,7 +3,7 @@ INSTALL_DIR = ${TEXMFHOME}/scripts/lua/lua-uca/
 LUA_DIR = src/lua-uca/
 
 
-all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua 
 
 
 
@@ -32,3 +32,7 @@ install:
 	mkdir -p ${INSTALL_DIR}
 	cp ${LUA_DIR}*.lua ${INSTALL_DIR}
 
+xindex: 
+	$(MAKE) -C $@
+
+.PHONY: all xindex
