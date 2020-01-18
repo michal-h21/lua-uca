@@ -1,5 +1,5 @@
 local collation = require "tools.collation"
-local serpent = require "serpent"
+local serpent = require "tools.serpent"
 
 local collator = collation.new()
 local ducet_file = io.open("data/allkeys.txt", "r")
