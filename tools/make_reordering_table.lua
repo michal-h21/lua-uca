@@ -339,6 +339,7 @@ end
 local function renumber_block(min, max, move)
   local newmin, newmax = min + move, max + move
   print(min, max, "=>",  newmin, newmax)
+  return newmin, newmax
 end
 
 local function reorder(what, blocks)
@@ -349,7 +350,7 @@ local function reorder(what, blocks)
     -- when reordering others, don't move anything, just set the
     -- minimal_others to the maximal value, so the next reordering will move 
     -- the reordered block behind all others
-    blocks.minimal_others = max_value 
+    blocks.minimal_others = max_value + 1
     return 
   end
   if not min then return nil, "Cannot find block for reordering" end
@@ -363,7 +364,8 @@ local function reorder(what, blocks)
     elseif v.status == inside_block then
       print("move", v.name)
       local move = blocks.minimal_others - max + move_offset
-      renumber_block(v.min, v.max, move)
+      local newmin, newmax = renumber_block(v.min, v.max, move)
+      blocks.minimal_others = newmax + 1
     end
   end
 
