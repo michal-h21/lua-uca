@@ -174,10 +174,18 @@ function UTFCompare(a,b)
 end
 
 function getSortChar(codepoints)
-  local codes = collator_obj:get_lowest_char(codepoints, 1)
-  local sort_char = utf8.char(table.unpack(codes))
-  -- print unicode category of the first char
-  return upper(sort_char) -- use unicode.utf8.upper to make the char uppercase
+  if #codepoints > 0 then 
+    local codes, pos = collator_obj:get_lowest_char(codepoints, 1)
+    if not codes then 
+      -- if the first character in the sort key doesn't return letter
+      -- continue until we find some
+      table.remove(codepoints, 1)
+      return getSortChar(codepoints)
+    end
+    local sort_char = utf8.char(table.unpack(codes))
+    -- print unicode category of the first char
+    return upper(sort_char) -- use unicode.utf8.upper to make the char uppercase
+  end
 end
 
 function SORTendhook(list)
@@ -187,8 +195,14 @@ function SORTendhook(list)
     v = list[i]
     -- the collator:get_lowest_char will return character on the given
     -- position. It will be lowercase and without accents.
-    local codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.Entry))
-    v.sortChar = getSortChar(codepoints)
+    local codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.SortKey))
+    -- local codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.Entry))
+    v.sortChar = getSortChar(codepoints) --or getSortChar(collator_obj:string_to_codepoints(NormalizedUpper(v.Entry)))
+    if not v.sortChar then
+      -- alternativelly use v.Entry if SortKey doesn't contain usable string
+      codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.Entry))
+      v.sortChar = getSortChar(codepoints)
+    end
     categorize(codepoints, v, ordering_categories)
   end
   return uncategorize(ordering_categories)

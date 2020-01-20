@@ -143,14 +143,17 @@ function collator:get_lowest_char(codepoints, pos)
 
 
   local weights, next_pos = self:read_weight(codepoints, pos)
-  local weight_to_char = self.weight_to_char or self:weight_to_codepoints()
-  self.weight_to_char = weight_to_char
-  -- find the primary weight of the matched character
-  local first = weights[1][1]
-  local current = weight_to_char[first]
-  -- traverse the tree to find the codepoint with the lowest weight
-  local x = find_codepoints(current)
-  return x
+  local x 
+  if weights then
+    local weight_to_char = self.weight_to_char or self:weight_to_codepoints()
+    self.weight_to_char = weight_to_char
+    -- find the primary weight of the matched character
+    local first = weights[1][1]
+    local current = weight_to_char[first]
+    -- traverse the tree to find the codepoint with the lowest weight
+    x = find_codepoints(current)
+  end
+  return x, next_pos
 end
 
 function collator:update_levels(levels, weights)
