@@ -284,6 +284,7 @@ for k,v in pairs(tables) do
 end
 
 table.sort(newtable, function(a,b) return a.min<b.min end)
+
 for k,v in ipairs(newtable) do
   local nextel = newtable[k + 1] or {}
   local nextmin = nextel.min 
@@ -335,6 +336,11 @@ local function clasify_blocks(blocks, search)
   end
 end
 
+local function renumber_block(min, max, move)
+  local newmin, newmax = min + move, max + move
+  print(min, max, "=>",  newmin, newmax)
+end
+
 local function reorder(what, blocks)
 
   local min, max = get_range(what, blocks)
@@ -349,9 +355,15 @@ local function reorder(what, blocks)
   if not min then return nil, "Cannot find block for reordering" end
   local search = get_search_table(min, max, max_value, blocks)
   clasify_blocks(blocks, search)
+  local move_offset = max - min + 1
   for k,v in ipairs(blocks) do
-    if v.status == move or v.status == inside_block then
-      print(v.name, v.status)
+    if v.status == move then
+      print("renumber", v.name)
+      renumber_block(v.min, v.max, move_offset)
+    elseif v.status == inside_block then
+      print("move", v.name)
+      local move = blocks.minimal_others - max + move_offset
+      renumber_block(v.min, v.max, move)
     end
   end
 
