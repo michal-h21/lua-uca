@@ -336,9 +336,9 @@ local function clasify_blocks(blocks, search)
   end
 end
 
-local function renumber_block(min, max, move)
+local function renumber_block(block, min, max, move)
   local newmin, newmax = min + move, max + move
-  print(min, max, "=>",  newmin, newmax)
+  print(block[0], block[1], min, max, "=>",  newmin, newmax)
   return newmin, newmax
 end
 
@@ -347,11 +347,13 @@ local function renumber_blocks(blocks, min, max)
   for k,v in ipairs(blocks) do
     if v.status == move then
       print("renumber", v.name)
-      renumber_block(v.min, v.max, move_offset)
+      v.move = move_offset
+      renumber_block(v, v.min, v.max, move_offset)
     elseif v.status == inside_block then
       print("move", v.name)
       local move = blocks.minimal_others - max + move_offset
-      local newmin, newmax = renumber_block(v.min, v.max, move)
+      v.move = move
+      local newmin, newmax = renumber_block(v, v.min, v.max, move)
       blocks.minimal_others = newmax + 1
     end
   end
