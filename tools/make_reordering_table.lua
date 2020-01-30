@@ -295,7 +295,7 @@ for k,v in ipairs(newtable) do
       v.max = nextmin - 1
     end
   end
-  print(v.name, v.min, v.max)
+  -- print(v.name, v.min, v.max)
 
 end
 
@@ -338,29 +338,29 @@ end
 
 local function renumber_block(block, min, max, move)
   local newmin, newmax = min + move, max + move
-  print(block[0], block[1], min, max, "=>",  newmin, newmax)
+  block.move = (block.move or 0) + move
+  print(block.move, min, max, "=>",  newmin, newmax)
   return newmin, newmax
 end
 
 local function renumber_blocks(blocks, min, max)
   local move_offset = max - min + 1
   for k,v in ipairs(blocks) do
+    -- set default value that will be used for the block moving
+    v.move = v.move or 0
     if v.status == move then
       print("renumber", v.name)
-      v.move = move_offset
       renumber_block(v, v.min, v.max, move_offset)
     elseif v.status == inside_block then
       print("move", v.name)
       local move = blocks.minimal_others - max + move_offset
-      v.move = move
-      local newmin, newmax = renumber_block(v, v.min, v.max, move)
+      newmin, newmax = renumber_block(v, v.min, v.max, move)
       blocks.minimal_others = newmax + 1
     end
   end
 end
 
 local function reorder(what, blocks)
-
   local min, max = get_range(what, blocks)
   local max_value = blocks[#blocks].max -- find maximal value in blocks
   if what == "others" or what == "Zzzz" then 
@@ -374,11 +374,61 @@ local function reorder(what, blocks)
   local search = get_search_table(min, max, max_value, blocks)
   clasify_blocks(blocks, search)
   renumber_blocks(blocks, min, max)
+  return blocks
+end
 
-
+local function reorder_collator(collator, blocks)
+  local function prepare_search_table(blocks)
+    -- make search table for collator weights
+    -- initialize it with block that contain all values bellow the minimal block
+    local search = {{0, blocks[1].min - 1, 0}}
+    for _, block in ipairs(blocks) do
+      -- return move value for each script block
+      local t = {block.min, block.max, block.move}
+      search[#search+1] = t
+    end
+    return search
+  end
+  local function update_value(value, search) 
+    -- find the move offset for the primary weight in the reordering table
+    local first = value[1][1]
+    local status = binary_range_search(first, search) or {}
+    local move = status[3] or 0
+    if move ~= 0 then 
+      -- detect if we need to recalculate the primary weight
+      value[1][1] = first + move
+    end
+    return value
+  end
+  local function update_weights(entry, search)
+    -- recursivelly process weighgs for the current codepoint
+    if entry.value then
+      entry.value = update_value(entry.value, search)
+    end
+    if entry.children then
+      update_weights(entry.children, search)
+    end
+  end
+  local search = prepare_search_table(blocks)
+  for _, current in pairs(collator.codes) do
+    update_weights(current, search)
+  end
 end
 
 reorder("cyrillic", newtable)
 reorder("others", newtable)
 reorder("digits", newtable)
+
+print "------------------------------"
+-- test sort
+local collator_lib = require "src.lua-uca.lua-uca-collator"
+local ducet = require "src.lua-uca.lua-uca-ducet"
+local collator_obj = collator_lib.new(ducet)
+reorder_collator(collator_obj, newtable)
+
+local sort_table = {"12", "ahoj", "Первая"}
+table.sort(sort_table, function(a,b) return collator_obj:compare_strings(a,b) end)
+for _, x in ipairs(sort_table) do 
+  print(x)
+end
 
