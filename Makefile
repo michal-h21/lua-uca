@@ -31,6 +31,7 @@ test:
 	busted spec/ducet-spec.lua
 	busted spec/collator_spec.lua
 	busted spec/languages-spec.lua
+	busted spec/tailoring-spec.lua
 
 install: 
 	mkdir -p ${INSTALL_DIR}
