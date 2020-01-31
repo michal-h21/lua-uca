@@ -1,4 +1,25 @@
 
+local floor = math.floor
+
+-- search value in table with ranges
+-- source: Xindex
+local function binary_range_search(code_point, ranges)
+  local low, mid, high
+  low, high = 1, #ranges
+  while low <= high do
+    mid = floor((low + high) / 2)
+    local range = ranges[mid]
+    if code_point < range[1] then
+      high = mid - 1
+    elseif code_point <= range[2] then
+      return range, mid
+    else
+      low = mid + 1
+    end
+  end
+  return nil, mid
+end
+
 local function get_range(block, blocks)
   for _,v in ipairs(blocks) do
     if v.name == block then return v.min, v.max end
@@ -39,7 +60,6 @@ end
 local function renumber_block(block, min, max, move)
   local newmin, newmax = min + move, max + move
   block.move = (block.move or 0) + move
-  print(block.move, min, max, "=>",  newmin, newmax)
   return newmin, newmax
 end
 
@@ -49,10 +69,8 @@ local function renumber_blocks(blocks, min, max)
     -- set default value that will be used for the block moving
     v.move = v.move or 0
     if v.status == move then
-      print("renumber", v.name)
       renumber_block(v, v.min, v.max, move_offset)
     elseif v.status == inside_block then
-      print("move", v.name)
       local move = blocks.minimal_others - max + move_offset
       newmin, newmax = renumber_block(v, v.min, v.max, move)
       blocks.minimal_others = newmax + 1
@@ -113,6 +131,8 @@ local function reorder_collator(collator, blocks)
   for _, current in pairs(collator.codes) do
     update_weights(current, search)
   end
+  -- clear sortkey cache
+  collator.stringcache = {}
 end
 
 local M = {}
