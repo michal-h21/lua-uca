@@ -18,6 +18,8 @@ local function copy_table(tbl)
   return t
 end
 
+collator.copy_table = copy_table
+
 function collator.new(codes)
   local self = setmetatable({}, collator)
   -- tree with mappings from codepoints to collation elements
@@ -271,6 +273,20 @@ end
 function collator:tailor_string(s)
   tailoring_lib.tailor_string(self, s)
 end
+
+-- reorder scripts
+-- pass table with script names to reorder
+function collator:reorder(tbl)
+  -- make table of the reordering table
+  local t = copy_table(reordering_table)
+  for _, script in ipairs(tbl) do
+    -- reorder scripts
+    tailoring_lib.reorder(script, t)
+  end
+  -- apply reordering to the collator object
+  tailoring_lib.reorder_collator(self, t)
+end
+
 -- expand characters to another characters
 function collator:equal(base, target)
   local new_weight = {}
