@@ -16,9 +16,7 @@ describe("Test reordering", function()
     table.sort(sort_table, function(a,b) return collator_obj:compare_strings(a,b) end) 
   end
   local assert_order = function(t1, t2)
-    print("**********")
     for i = 1, #t1 do
-      print(t1[i], t2[i])
       assert.equals(t1[i], t2[i])
     end
   end
