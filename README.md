@@ -46,19 +46,23 @@ More samples of use can be found in the `spec` directory.
 
 ## Use with Xindex processor
 
-[Xindex](https://www.ctan.org/pkg/xindex) is flexible index processor written in Lua by Herbert Voß. It supports Lua configuration files, which enables use of Lua-UCA for sorting of the index entries, as shown in [this example](https://tex.stackexchange.com/a/524014/2891) for Norwegian text.
+[Xindex](https://www.ctan.org/pkg/xindex) is flexible index processor written
+in Lua by Herbert Voß. It supports Lua configuration files, which enables use
+of Lua-UCA for sorting of the index entries, as shown in [this
+example](https://tex.stackexchange.com/a/524014/2891) for Norwegian text.
 
-The `xindex` directory contains more advanced version of such configuration file together with several examples. Run `make xindex` command to compile them.
+The `xindex` directory contains more advanced version of such configuration
+file together with several examples. Run `make xindex` command to compile them.
 
 ## Change sorting rules
 
 The simplest way to change the default sorting order is to use the
-`languages.tailor_string` function. It updates the collator object using
+`collator_obj:tailor_string` function. It updates the collator object using
 special syntax which is subset of the format used by the [Unicode locale data
 markup
 language](https://www.unicode.org/reports/tr35/tr35-collation.html#Orderings).
 
-    languages.tailor_string(collator_obj, "&a<b")
+    collator_obj:tailor_string "&a<b"
 
 Full example with Czech rules:
 
@@ -68,7 +72,7 @@ Full example with Czech rules:
     local languages = require "lua-uca.lua-uca-languages"
     
     local collator_obj = collator.new(ducet)
-    local tailoring = function(s) languages.tailor_string(collator_obj, s) end
+    local tailoring = function(s) collator_obj:tailor_string(s) end
 
     tailoring "&c<č<<<Č"
     tailoring "&h<ch<<<cH<<<Ch<<<CH"
@@ -84,9 +88,10 @@ It is also possible to expand a letter to multiple letters, like this example fo
     tailoring "&Ö=Oe"
     tailoring "&ö=oe"
 
-Some languages, like Norwegian sort uppercase letters before lowercase. This can be enabled using `collator:uppercase_first()` function:
+Some languages, like Norwegian sort uppercase letters before lowercase. This
+can be enabled using `collator:uppercase_first()` function:
 
-    local tailoring = function(s) languages.tailor_string(collator_obj, s) end
+    local tailoring = function(s) collator_obj:tailor_string(s) end
     collator_obj:uppercase_first()
     tailoring("&D<<đ<<<Đ<<ð<<<Ð")
     tailoring("&th<<<þ")
@@ -104,9 +109,27 @@ using:
 
 The `uconv` utility is a part of the [ICU Project](http://userguide.icu-project.org/).
 
+### Script reordering
+
+Many languages sort different scripts after the script this language uses. As
+Latin based scripts are sorted first, it is necessary to reorder scripts in
+such cases.
+
+The `collator_obj:reorder` function takes table with scripts that need to be reorderd. 
+For example Cyrillic can be sorted before Latin using:
+
+    collator_obj:reorder {"cyrillic"}
+
+In German or Czech, numbers should be sorted after all other characters. This can be done using:
+
+    collator_obj:reorder {"others", "digits"}
+
+The special keyword "others" means that the scripts that follows in the table
+will be sorted at the very end.
+
+
 # What is missing
 
 - Tailorings for most languages.
-- There is currently no support for reordering of sorting character groups such as digits or specific scripts. 
 - Algorithm for setting implicit sort weights of characters that are not explicitly listed in DUCET.
 - Special handling of CJK scripts.
