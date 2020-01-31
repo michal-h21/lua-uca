@@ -1,3 +1,4 @@
 *.swp
 data/
 src/lua-uca/lua-uca-ducet.lua
+src/lua-uca/lua-uca-reordering-table.lua
