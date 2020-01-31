@@ -3,7 +3,7 @@ INSTALL_DIR = ${TEXMFHOME}/scripts/lua/lua-uca/
 LUA_DIR = src/lua-uca/
 
 
-all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua 
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-reordering-table.lua
 
 
 
@@ -20,6 +20,10 @@ data/common:
 src/lua-uca/lua-uca-ducet.lua:
 	mkdir -p src/lua-uca
 	texlua tools/make_ducet.lua > src/lua-uca/lua-uca-ducet.lua
+
+src/lua-uca/lua-uca-reordering-table.lua:
+	mkdir -p src/lua-uca
+	texlua tools/make_reordering_table.lua > $@
 
 .PHONY: test install
 
