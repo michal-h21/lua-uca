@@ -1,5 +1,7 @@
 -- object for Unicode string collation
 local math = require "math"
+local tailoring_lib = require "lua-uca.lua-uca-tailoring"
+local reordering_table = require "lua-uca.lua-uca-reordering-table"
 
 local collator = {}
 collator.__index = collator
@@ -265,6 +267,10 @@ function collator:tailor(base, target, tailoring_table)
   self:update_codes(target, new_value)
 end
 
+-- support for CLDR style strings
+function collator:tailor_string(s)
+  tailoring_lib.tailor_string(self, s)
+end
 -- expand characters to another characters
 function collator:equal(base, target)
   local new_weight = {}

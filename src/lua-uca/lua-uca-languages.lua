@@ -1,44 +1,9 @@
 local languages = {}
-local tailoring_table = {1, 0, 0}
-local secondary_tailoring = {0, 1, 0}
-local tertiary_tailoring = {0, 0, 1}
-local equal_tailoring= {0, 0, 0}
-
-local function equal_string(collator_obj,base, target)
-  collator_obj:equal(collator_obj:string_to_codepoints(base), collator_obj:string_to_codepoints(target))
-end
-
-local function tailor_string(collator_obj, str)
-  -- cupport the cldr strings in the form: &D<<đ<<<Đ<<ð<<<Ð
-  -- it is important that the strings are in the NFC normal form
-  -- the CLDR XML files are in NFD, so they need to be converted
-  -- for example using `uconv -x any-nfc < file.xml`
-  local function tailor(a, b, tbl) 
-    local autf = collator_obj:string_to_codepoints(a)
-    local butf = collator_obj:string_to_codepoints(b)
-    collator_obj:tailor(autf,butf, tbl) 
-  end
-  local function tailor_equal(base, target)
-    equal_string(collator_obj, base, target)
-  end
-  local function tailor_primary(a,b) tailor(a,b, tailoring_table) end
-  local function tailor_secondary(a,b) tailor(a,b, secondary_tailoring) end
-  local function tailor_tertiary(a,b) tailor(a,b, tertiary_tailoring) end
-  local functions = {["<"] = tailor_primary, ["<<"] = tailor_secondary, ["<<<"] = tailor_tertiary, ["="] = tailor_equal}
-  local first = str:match("^&?([^%<^%=]+)")
-  for fn, second in str:gmatch("([<=]+)([^<^%=]+)") do
-    local exec = functions[fn]
-    exec(first, second)
-    first = second -- set the current second object as first for the next round
-  end
-end
-
-languages.tailor_string = tailor_string
 
 
 
 languages.cs = function(collator_obj)
-  local tailoring = function(s) tailor_string(collator_obj, s) end
+  local tailoring = function(s) collator_obj:tailor_string(s) end
   tailoring "&c<č<<<Č"
   tailoring "&h<ch<<<cH<<<Ch<<<CH"
   tailoring "&R<ř<<<Ř"
@@ -49,7 +14,7 @@ end
 
 
 languages.da = function(collator_obj)
-  local tailoring = function(s) tailor_string(collator_obj, s) end
+  local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:uppercase_first()
   tailoring("&D<<đ<<<Đ<<ð<<<Ð")
   tailoring("&th<<<þ")
@@ -62,6 +27,8 @@ end
 
 languages.de = function(collator_obj)
   local tailoring = function(s) tailor_string(collator_obj, s) end
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:uppercase_first()
   tailoring "&th<<<þ"
   tailoring "&TH<<<Þ"
   tailoring "&Y<<ƿ<<<Ƿ<<ʒ<<<Ʒ<<<ᶾ"
@@ -77,7 +44,8 @@ languages.de_din2 = function(collator_obj)
     local butf = collator_obj:string_to_codepoints(b)
     collator_obj:tailor(autf,butf, tbl) 
   end
-  local tailoring = function(s) tailor_string(collator_obj, s) end
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:uppercase_first()
   languages.de(collator_obj)
   tailoring "&Ö=Oe"
   tailoring "&ö=oe"
@@ -85,7 +53,7 @@ languages.de_din2 = function(collator_obj)
 end
 
 languages.no = function(collator_obj)
-  local tailoring = function(s) tailor_string(collator_obj, s) end
+  local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:uppercase_first()
   tailoring("&D<<đ<<<Đ<<ð<<<Ð")
   tailoring("&th<<<þ")
