@@ -1,6 +1,7 @@
 local ducet = require "lua-uca.lua-uca-ducet"
 local collator = require "lua-uca.lua-uca-collator"
 local languages = require "lua-uca.lua-uca-languages"
+local tailoring_lib = require "lua-uca.lua-uca-tailoring"
 
 describe("Test language support", function()
   local czech = collator.new(ducet)
@@ -19,7 +20,7 @@ describe("Test language support", function()
   it("should support the tailoring dsl", function()
     -- test tailoring dsl
     --
-    languages.tailor_string(czech,"&z<ž")
+    tailoring_lib.tailor_string(czech,"&z<ž")
     local z, zcaron = utf8.codepoint("z"), utf8.codepoint("ž")
     local zweight, zcaronweight = czech.codes[z], czech.codes[zcaron]
     assert.truthy(zcaronweight.value[1][1] - zweight.value[1][1] == 1)
