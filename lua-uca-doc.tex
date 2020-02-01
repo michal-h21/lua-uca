@@ -1,0 +1,30 @@
+\documentclass{ltxdoc}
+
+
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\newcommand\authormail[1]{\footnote{\textless\url{#1}\textgreater}}
+\ifdefined\HCode
+\renewcommand\authormail[1]{\space\textless\Link[#1]{}{}#1\EndLink\textgreater}
+\fi
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Schola}
+% \setmonofont[Scale=MatchLowercase]{Inconsolatazi4}
+\IfFontExistsTF{Noto Sans Mono Regular}{%
+  \setmonofont[Scale=MatchLowercase]{Noto Sans Mono Regular}
+}{\setmonofont{NotoMono-Regular.ttf}}
+
+\usepackage{upquote}
+\usepackage{microtype}
+\usepackage[hybrid]{markdown}
+
+\title{The \texttt{Lua-UCA} library}
+\author{Michal Hoftich\authormail{michal.h21@gmail.com}}
+\date{Version \version\\\gitdate}
+\begin{document}
+\maketitle
+\tableofcontents
+\markdownInput{README.md}
+
+\end{document}
