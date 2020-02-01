@@ -9,6 +9,7 @@ languages.cs = function(collator_obj)
   tailoring "&R<ř<<<Ř"
   tailoring "&s<š<<<Š"
   tailoring "&z<ž<<<Ž"
+  collator_obj:reorder {"others", "digits"}
   return collator_obj
 end
 
@@ -64,5 +65,9 @@ languages.no = function(collator_obj)
   return collator_obj
 end
 
+languages.ru = function(collator_obj)
+  collator_obj:reorder{ "cyrillic" }
+  return collator_obj
+end
 
 return languages
