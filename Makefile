@@ -1,3 +1,4 @@
+lua_content = $(wildcard src/lua-uca/*.lua) 
 TEXMFHOME = $(shell kpsewhich -var-value=TEXMFHOME)
 INSTALL_DIR = ${TEXMFHOME}/scripts/lua/lua-uca/
 LUA_DIR = src/lua-uca/
@@ -7,6 +8,7 @@ README = README.md
 DOC_BASE = lua-uca-doc
 DOC_SOURCES = $(DOC_BASE).tex $(README)
 DOC_PDF = $(DOC_BASE).pdf
+BUILD_DIR = build
 
 ifeq ($(strip $(shell git rev-parse --is-inside-work-tree 2>/dev/null)),true)
 	VERSION:= $(shell git --no-pager describe --abbrev=0 --tags --always )
@@ -44,7 +46,7 @@ test:
 	busted spec/languages-spec.lua
 	busted spec/tailoring-spec.lua
 
-$(DOC_PDF): $(DOC_SOURCES) install
+$(DOC_PDF): $(DOC_SOURCES) 
 	lualatex '\def\version{${VERSION}}\def\gitdate{${DATE}}\input{$<}'
 
 
@@ -55,4 +57,11 @@ install:
 xindex: 
 	$(MAKE) -C $@
 
-.PHONY: all xindex
+build: $(DOC_PDF) $(DOC_SOURCES) $(lua_content) 
+	mkdir -p $(BUILD_DIR)/lua-uca/lua-uca
+	cp $(lua_content) $(BUILD_DIR)/lua-uca/lua-uca/
+	cp $(DOC_PDF) $(DOC_SOURCES) $(BUILD_DIR)/lua-uca/
+	@cd $(BUILD_DIR) && zip -r lua-uca.zip lua-uca
+
+
+.PHONY: all xindex build
