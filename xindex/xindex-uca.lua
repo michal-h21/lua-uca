@@ -74,62 +74,6 @@ indexheader = {
   cs = {"Symboly", "Čísla"}
 }
 
--- support reordering of the entries
-
-orders = {
-  cs = {"other", "digits"},
-  ru = {"cyrillic", "other"}
-
-}
-
-function makeOrderingCategories(language)
-  -- if there are no reordering for the given language, just return other
-  local order = orders[language] or {"other"}
-  local categories = {order = order, categories = {}}
-  -- make subtable for each category
-  for _, category in pairs(order) do categories.categories[category] = {} end
-  return categories
-end
-
-
--- just few blocks, there should be more
-local unicode_blocks = {
-    {0x0000, 0x007F, "latin"},
-    {0x0080, 0x00FF, "latin"},
-    {0x0100, 0x017F, "latin"},
-    {0x0180, 0x024F, "latin"},
-    {0x0250, 0x02AF, "latin"},
-    {0x0370, 0x03FF, "greek"},
-    {0x0400, 0x04FF, "cyrillic"},
-    {0x0500, 0x052F, "cyrillic"},
-    {0x0530, 0x058F, "armenian"},
-    {0x0590, 0x05FF, "hebrew"},
-    {0x0600, 0x06FF, "arabic"},
-    {0x0700, 0x074F, "syriac"},
-    {0x0750, 0x077F, "arabic"},
-    {0x0860, 0x086F, "syriac"},
-    {0x08A0, 0x08FF, "arabic"},
-}
-
--- copy from xindex-lib.lua, it is unfortunatelly unavailable globally
-local floor = math.floor
-local function binary_range_search(code_point, ranges)
-  local low, mid, high
-  low, high = 1, #ranges
-  while low <= high do
-    mid = floor((low + high) / 2)
-    local range = ranges[mid]
-    if code_point < range[1] then
-      high = mid - 1
-    elseif code_point <= range[2] then
-      return range, mid
-    else
-      low = mid + 1
-    end
-  end
-  return nil, mid
-end
-
 
 -- get Unicode category of the codepoint, if supported
 function getCategory(codepoints)
@@ -189,23 +133,20 @@ function getSortChar(codepoints)
 end
 
 function SORTendhook(list)
-  local ordering_categories = makeOrderingCategories(language)
   -- get the headers for letter groups
   for i=1, #list do
     v = list[i]
     -- the collator:get_lowest_char will return character on the given
     -- position. It will be lowercase and without accents.
     local codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.SortKey))
-    -- local codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.Entry))
     v.sortChar = getSortChar(codepoints) --or getSortChar(collator_obj:string_to_codepoints(NormalizedUpper(v.Entry)))
     if not v.sortChar then
       -- alternativelly use v.Entry if SortKey doesn't contain usable string
       codepoints = collator_obj:string_to_codepoints(NormalizedUpper(v.Entry))
       v.sortChar = getSortChar(codepoints)
     end
-    categorize(codepoints, v, ordering_categories)
   end
-  return uncategorize(ordering_categories)
+  return list
 end
 
 -- We use Lua-UCA methods for sorting and determining first characters, so
