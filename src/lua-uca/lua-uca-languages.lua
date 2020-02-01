@@ -27,7 +27,6 @@ languages.da = function(collator_obj)
 end
 
 languages.de = function(collator_obj)
-  local tailoring = function(s) tailor_string(collator_obj, s) end
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:uppercase_first()
   tailoring "&th<<<þ"
@@ -46,7 +45,6 @@ languages.de_din2 = function(collator_obj)
     collator_obj:tailor(autf,butf, tbl) 
   end
   local tailoring = function(s) collator_obj:tailor_string(s) end
-  collator_obj:uppercase_first()
   languages.de(collator_obj)
   tailoring "&Ö=Oe"
   tailoring "&ö=oe"
