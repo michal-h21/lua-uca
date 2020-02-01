@@ -89,7 +89,7 @@ It is also possible to expand a letter to multiple letters, like this example fo
     tailoring "&ö=oe"
 
 Some languages, like Norwegian sort uppercase letters before lowercase. This
-can be enabled using `collator:uppercase_first()` function:
+can be enabled using `collator_obj:uppercase_first()` function:
 
     local tailoring = function(s) collator_obj:tailor_string(s) end
     collator_obj:uppercase_first()
