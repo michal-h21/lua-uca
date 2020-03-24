@@ -18,6 +18,7 @@
 \usepackage{upquote}
 \usepackage{microtype}
 \usepackage[hybrid]{markdown}
+\usepackage{luacode}
 
 \title{The \texttt{Lua-UCA} library}
 \author{Michal Hoftich\authormail{michal.h21@gmail.com}}
@@ -26,5 +27,24 @@
 \maketitle
 \tableofcontents
 \markdownInput{README.md}
+
+\section{Available languages}
+
+The \texttt{lua-uca-languages} library provides the following langauges:
+\bgroup\ttfamily
+\begin{luacode*}
+-- get list of the currently supported languages directly from the library
+local l = {}
+local languages = require "lua-uca-languages"
+for lang, _ in pairs(languages) do
+l[#l+1] = lang:gsub("_", '\\_')
+end
+
+table.sort(l)
+tex.print(table.concat(l, ", "))
+\end{luacode*}
+\egroup
+
+\markdownInput{CHANGELOG.md}
 
 \end{document}

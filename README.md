@@ -27,7 +27,9 @@ To sort a table using Czech collation rules:
     
     local t = {"cihla",  "chochol", "hudba", "jasan", "čáp"}
     
-    table.sort(t, function(a,b) return collator_obj:compare_strings(a,b) end)
+    table.sort(t, function(a,b) 
+      return collator_obj:compare_strings(a,b) 
+    end)
     
     for _, v in ipairs(t) do
       print(v)
@@ -51,13 +53,13 @@ in Lua by Herbert Voß. It supports Lua configuration files, which enables use
 of Lua-UCA for sorting of the index entries, as shown in [this
 example](https://tex.stackexchange.com/a/524014/2891) for Norwegian text.
 
-The `xindex` directory contains more advanced version of such configuration
+The `xindex` directory in the [source repository](https://github.com/michal-h21/lua-uca/tree/master/xindex) contains more advanced version of such configuration
 file together with several examples. Run `make xindex` command to compile them.
 
 ## Change sorting rules
 
 The simplest way to change the default sorting order is to use the
-`collator_obj:tailor_string` function. It updates the collator object using
+`tailor_string` method of the `collator_obj` object. It updates the collator object using
 special syntax which is subset of the format used by the [Unicode locale data
 markup
 language](https://www.unicode.org/reports/tr35/tr35-collation.html#Orderings).
