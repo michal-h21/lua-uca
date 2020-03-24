@@ -2,3 +2,15 @@
 data/
 src/lua-uca/lua-uca-ducet.lua
 src/lua-uca/lua-uca-reordering-table.lua
+*.log
+*.idx
+*.ind
+*.ilg
+*.pdf
+*.out
+*.toc
+build
+tags
+_markdown_lua-uca-doc
+src/luaindex/
+
