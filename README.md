@@ -4,7 +4,7 @@ This package adds support for the [Unicode collation algorithm](https://unicode.
 
 ## Install 
 
-The package needs to download Unicode collation data and convert it to a Lua table. It depends on `wget` and `unzip` utitilities.
+The package needs to download Unicode collation data and convert it to a Lua table. It depends on `wget` and `unzip` utilities.
 
 To install the package in the local TEXMF tree, run:
 
@@ -117,7 +117,7 @@ Many languages sort different scripts after the script this language uses. As
 Latin based scripts are sorted first, it is necessary to reorder scripts in
 such cases.
 
-The `collator_obj:reorder` function takes table with scripts that need to be reorderd. 
+The `collator_obj:reorder` function takes table with scripts that need to be reordered. 
 For example Cyrillic can be sorted before Latin using:
 
     collator_obj:reorder {"cyrillic"}

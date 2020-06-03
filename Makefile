@@ -60,7 +60,7 @@ xindex:
 build: $(DOC_PDF) $(DOC_SOURCES) $(lua_content) 
 	mkdir -p $(BUILD_DIR)/lua-uca/lua-uca
 	cp $(lua_content) $(BUILD_DIR)/lua-uca/lua-uca/
-	cp $(DOC_PDF) $(DOC_SOURCES) $(BUILD_DIR)/lua-uca/
+	cp $(DOC_PDF) $(DOC_SOURCES) Makefile $(BUILD_DIR)/lua-uca/
 	@cd $(BUILD_DIR) && zip -r lua-uca.zip lua-uca
 
 
