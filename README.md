@@ -41,12 +41,11 @@ More samples of use can be found in the `spec` directory.
 ## Use with Xindex processor
 
 [Xindex](https://www.ctan.org/pkg/xindex) is flexible index processor written
-in Lua by Herbert Voß. It supports Lua configuration files, which enables use
-of Lua-UCA for sorting of the index entries, as shown in [this
-example](https://tex.stackexchange.com/a/524014/2891) for Norwegian text.
+in Lua by Herbert Voß. It has built-in `Lua-UCA` support starting with version
+`0.23`. The support can be requested using the `-u` option:
 
-The `xindex` directory in the [source repository](https://github.com/michal-h21/lua-uca/tree/master/xindex) contains more advanced version of such configuration
-file together with several examples. Run `make xindex` command to compile them.
+     xindex -u -l no -c norsk filename.idx
+
 
 ## Change sorting rules
 
