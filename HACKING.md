@@ -29,6 +29,8 @@ Run `make xindex` command to compile them.
 
 `Xindex` has built-in support for Lua-UCA since version `0.23`, it can be requested using the `-u` option.
 
+The `tools/indexing-sample.lua` file provides a simple indexing processor, independent of any other tool.  
+
 ## Testing
 
 You can run unit tests using the following command:
@@ -36,5 +38,8 @@ You can run unit tests using the following command:
     make test
 
 Testing requires [Busted](https://olivinelabs.com/busted/) testing framework installed on your system.
+Tests are placed in the `spec` directory and they provide more examples of the package usage.
+
+
 
 

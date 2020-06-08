@@ -35,8 +35,8 @@ The output:
 > chochol
 > jasan
 
-More samples of use can be found in the `spec` directory.
-`tools/indexing-sample.lua` is a simple indexing processor. 
+More samples of the library usage can be found in the source repository of this package on [Github](https://github.com/michal-h21/lua-uca).
+See `HACKING.md` file in the repo for more information.
 
 ## Use with Xindex processor
 
