@@ -93,14 +93,9 @@ can be enabled using `collator_obj:uppercase_first()` function:
     tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
     tailoring("&oe<<œ<<<Œ")
 
-The `data/common/collation/` directory contains files from the `CLDR` project.
-They contain rules for many languages. The files needs to be normalized to the
-[NFC form](https://en.wikipedia.org/wiki/Unicode_equivalence), for example
-using:
-
-    cat cs.xml | uconv -x any-nfc -o cs.xml
-
-The `uconv` utility is a part of the [ICU Project](http://userguide.icu-project.org/).
+More information on a new language support is in the `HACKING.md`
+document in the [`Lua-UCA` Github
+repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
 
 ### Script reordering
 
