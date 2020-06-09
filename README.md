@@ -36,7 +36,7 @@ The output:
 > jasan
 
 More samples of the library usage can be found in the source repository of this package on [Github](https://github.com/michal-h21/lua-uca).
-See `HACKING.md` file in the repo for more information.
+% See `HACKING.md` file in the repo for more information.
 
 ## Use with Xindex processor
 
@@ -81,7 +81,7 @@ It is also possible to expand a letter to multiple letters, like this example fo
     tailoring "&Ö=Oe"
     tailoring "&ö=oe"
 
-Some languages, like Norwegian sort uppercase letters before lowercase. This
+Some languages, like Norwegian, sort uppercase letters before lowercase. This
 can be enabled using `collator_obj:uppercase_first()` function:
 
     local tailoring = function(s) collator_obj:tailor_string(s) end
@@ -93,9 +93,8 @@ can be enabled using `collator_obj:uppercase_first()` function:
     tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
     tailoring("&oe<<œ<<<Œ")
 
-More information on a new language support is in the `HACKING.md`
-document in the [`Lua-UCA` Github
-repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
+% More information on a new language support is in the `HACKING.md`
+% document in the [`Lua-UCA` Github repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
 
 ### Script reordering
 
