@@ -6,7 +6,7 @@ VERSION:= undefined
 DATE:= undefined
 README = README.md
 DOC_BASE = lua-uca-doc
-DOC_SOURCES = $(DOC_BASE).tex $(README) CHANGELOG.md LICENSE
+DOC_SOURCES = $(DOC_BASE).tex $(README) CHANGELOG.md LICENSE HACKING.md
 DOC_PDF = $(DOC_BASE).pdf
 BUILD_DIR = build
 
