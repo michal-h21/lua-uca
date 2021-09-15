@@ -551,6 +551,61 @@ languages.ky = function(collator_obj)
   return collator_obj
 end
 
+languages.lb = function(collator_obj)
+  return collator_obj
+end
+
+languages.lkt = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&C<č<<<Č"
+  tailoring "&G<ǧ<<<Ǧ"
+  tailoring "&H<ȟ<<<Ȟ"
+  tailoring "&S<š<<<Š"
+  tailoring "&Z<ž<<<Ž"
+  return collator_obj
+end
+
+languages.ln = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&E<ɛ<<<Ɛ"
+  tailoring "&O<<ɔ<<<Ɔ"
+  return collator_obj
+end
+
+languages.lo = function(collator_obj)
+  collator_obj:reorder{ "lao" }
+  return collator_obj
+end
+
+languages.lt = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&̀=̇̀"
+  tailoring "&́=̇́"
+  tailoring "&̃=̇̃"
+  tailoring "&A<<ą<<<Ą"
+  tailoring "&C<č<<<Č"
+  tailoring "&E<<ę<<<Ę<<ė<<<Ė"
+  tailoring "&I<<į<<<Į<<y<<<Y"
+  tailoring "&S<š<<<Š"
+  tailoring "&U<<ų<<<Ų<<ū<<<Ū"
+  tailoring "&Z<ž<<<Ž"
+  return collator_obj
+end
+
+languages.lv = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&D<č<<<Č"
+  tailoring "&H<ģ<<<Ģ"
+  tailoring "&I<<y<<<Y"
+  tailoring "&L<ķ<<<Ķ"
+  tailoring "&M<ļ<<<Ļ"
+  tailoring "&O<ņ<<<Ņ"
+  tailoring "&S<ŗ<<<Ŗ"
+  tailoring "&T<š<<<Š"
+  tailoring "&Ʒ<ž<<<Ž"
+  return collator_obj
+end
+
 languages.mk = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:reorder{ "cyrillic" }
