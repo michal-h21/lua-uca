@@ -51,6 +51,11 @@ languages.de_din2 = function(collator_obj)
   return collator_obj
 end
 
+languages.en = function(collator_obj)
+  -- default sorting
+  return collator_obj
+end
+
 languages.no = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:uppercase_first()
