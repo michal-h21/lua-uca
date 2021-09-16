@@ -119,6 +119,5 @@ will be sorted at the very end.
 
 # What is missing
 
-- Tailorings for most languages.
 - Algorithm for setting implicit sort weights of characters that are not explicitly listed in DUCET.
 - Special handling of CJK scripts.
