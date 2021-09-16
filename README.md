@@ -121,3 +121,11 @@ will be sorted at the very end.
 
 - Algorithm for setting implicit sort weights of characters that are not explicitly listed in DUCET.
 - Special handling of CJK scripts.
+
+\iffalse
+# Copyright
+
+Michal Hoftich, 2021. See LICENSE file for more details.
+
+
+\fi
