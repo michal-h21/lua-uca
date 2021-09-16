@@ -2,6 +2,7 @@
 
 2021-09-16
 
+  - version `0.1a` released.
   - added sorting rules for all languages contained in CLDR collation files.
 
 2020-06-09
@@ -11,5 +12,5 @@
 
 2020-03-24
   
-  - version `0.1` released
-  - initial version for CTAN
+  - version `0.1` released.
+  - initial version for CTAN.
