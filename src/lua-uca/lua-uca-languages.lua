@@ -14,6 +14,7 @@ end
 languages.ar = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:reorder{ "arabic" }
+  -- these are tailorings from "compat". standard tailorings are huge
   tailoring "&ت<<ة<<<ﺔ<<<ﺓ"
   tailoring "&ي<<ى<<<ﯨ<<<ﯩ<<<ﻰ<<<ﻯ<<<ﲐ<<<ﱝ"
   return collator_obj
@@ -173,12 +174,12 @@ languages.dsb = function(collator_obj)
   return collator_obj
 end
 
--- rules for this language are quite complex, I will add them in the future
--- languages.dz = function(collator_obj)
---   local tailoring = function(s) collator_obj:tailor_string(s) end
---   collator_obj:reorder {"tibetan"}
---   return collator_obj
--- end
+languages.dz = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder {"tibetan"}
+  -- tons of tailorings ommited
+  return collator_obj
+end
 
 languages.ee = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
@@ -428,8 +429,12 @@ languages.it = function(collator_obj)
   return collator_obj
 end
 
--- languages.ja - in the future
---
+languages.ja = function(collator_obj)
+  collator_obj:reorder{"latin", "kana", "han"}
+  -- tons of tailorings ommited
+  return collator_obj
+end
+
 languages.ka = function(collator_obj)
   collator_obj:reorder{"georgian"}
   return collator_obj
@@ -456,7 +461,7 @@ languages.kl = function(collator_obj)
   return collator_obj
 end
 
-languages.kl = function(collator_obj)
+languages.km = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:reorder{ "khmer" }
   tailoring "&។ល។<<<៘"
@@ -529,8 +534,7 @@ end
 languages.ko = function(collator_obj)
   -- this is pretty incomplete, there are tons of tailorings in the xml file
   -- we will support them maybe in the future
-  -- the original reorder in xml is Hang Hani <- I don't know what it is
-  collator_obj:reorder{"hangul"}
+  collator_obj:reorder{"hangul", "han"}
   return collator_obj
 end
 
@@ -614,6 +618,81 @@ languages.mk = function(collator_obj)
   return collator_obj
 end
 
+languages.ml = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"malayalam","latin", "devanagari", "arabic","tamil", "kannada", "telugu", "bengali", "gurmukhi","gujarati","oriya","sinhala" }
+  tailoring "&ഃ<<ഽ"
+  tailoring "&\u{0D4C}<<\u{0D57}"
+  tailoring "&ക്<<ക്\u{200D}<<<ൿ"
+  tailoring "&ണ്<<ണ്\u{200D}<<<ൺ"
+  tailoring "&ന്<<ന്\u{200D}<<<ൻ"
+  tailoring "&ര്<<ര്\u{200D}<<<ർ"
+  tailoring "&ല്<<ല്\u{200D}<<<ൽ"
+  tailoring "&ള്<<ള്\u{200D}<<<ൾ"
+  tailoring "&മ്<<ം"
+  tailoring "&ന്<<<ൻ്"
+  return collator_obj
+end
+
+languages.mn = function(collator_obj)
+  collator_obj:reorder{ "cyrillic", "mongolian" }
+  return collator_obj
+end
+
+languages.mr = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"devanagari", "bengali", "gurmukhi", "gujarati", "oriya", "tamil", "telugu", "kannada", "malayalam", "sinhala"}
+  tailoring "&ॐ<ं<<ँ<ः"
+  tailoring "&ह<ळ"
+  tailoring "<क्ष"
+  tailoring "<ज्ञ"
+  return collator_obj
+end
+
+languages.ms = function(collator_obj)
+  return collator_obj
+end
+
+languages.mt = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:uppercase_first()
+  tailoring "&c<ċ<<<Ċ"
+  tailoring "&g<ġ<<<Ġ"
+  tailoring "&h<għ<<<gĦ<<<Għ<<<GĦ"
+  tailoring "&i<ħ<<<Ħ"
+  tailoring "&z<ż<<<Ż"
+  return collator_obj
+end
+
+
+languages.my = function(collator_obj)
+  -- there are tons of tailoring in the xml file, at the moment we just reorder
+  collator_obj:reorder{ "myanmar" }
+  return collator_obj
+end
+
+languages.nb = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&D<<đ<<<Đ<<ð<<<Ð"
+  tailoring "&t<<<þ/h"
+  tailoring "&T<<<Þ/H"
+  tailoring "&Y<<ü<<<Ü<<ű<<<Ű"
+  tailoring "&ǀ<æ<<<Æ<<ä<<<Ä<<ę<<<Ę<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<<œ<<<Œ<å<<<Å<<aa<<<Aa<<<AA"
+  return collator_obj
+end
+
+languages.ne = function(collator_obj)
+  collator_obj:reorder{ "devanagari" }
+  return collator_obj
+end
+
+languages.nl = function(collator_obj)
+  return collator_obj
+end
+
+-- 
+languages.nn = languages.nb
+
 languages.no = function(collator_obj)
   local tailoring = function(s) collator_obj:tailor_string(s) end
   collator_obj:uppercase_first()
@@ -626,13 +705,380 @@ languages.no = function(collator_obj)
   return collator_obj
 end
 
+languages.om = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&Z<ch<<<Ch<<<CH<dh<<<Dh<<<DH<kh<<<Kh<<<KH<ny<<<Ny<<<NY<ph<<<Ph<<<PH<sh<<<Sh"
+  return collator_obj
+end
+
+languages["or"] = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"oriya", "devanagari", "bengali", "gurmukhi", "gujarati", "tamil", "telugu", "kannada", "malayalam", "sinhala"}
+  tailoring "&ଔ<ଁ<ଂ<ଃ"
+  tailoring "&ହ<କ୍ଷ"
+  tailoring "&ଯ<<ୟ"
+  return collator_obj
+end
+
+languages.pa = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"gurmukhi", "devanagari", "bengali", "gujarati", "oriya", "tamil", "telugu", "kannada", "malayalam", "sinhala", "arabic"}
+  tailoring "&ੱ<<ੰ<<ਂ<<ਁ<<਼"
+  tailoring "&ੜ<੍"
+  return collator_obj
+end
+
+languages.pl = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<ą<<<Ą"
+  tailoring "&C<ć<<<Ć"
+  tailoring "&E<ę<<<Ę"
+  tailoring "&L<ł<<<Ł"
+  tailoring "&N<ń<<<Ń"
+  tailoring "&O<ó<<<Ó"
+  tailoring "&S<ś<<<Ś"
+  tailoring "&Z<ź<<<Ź<ż<<<Ż"
+  return collator_obj
+end
+
+
+languages.ps = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"arabic"}
+  tailoring "&َ<<ِ<<ُ<<ً<<ٍ<<ٌ"
+  tailoring "&ا<آ"
+  tailoring "&ا<<أ<<ٲ<<ٱ<<إ<<ٳ<ء"
+  tailoring "&ت<ټ<<ٹ"
+  tailoring "&ج<ځ<<حٔ"
+  tailoring "&چ<څ"
+  tailoring "&د<ډ<<ڈ"
+  tailoring "&ر<ړ<<ڑ"
+  tailoring "&ژ<ږ"
+  tailoring "&ک<<*ڪك"
+  tailoring "&ګ<<گ"
+  tailoring "&ڼ<<ڻ"
+  tailoring "&و<<ؤ<<ۇ<<ۉ"
+  tailoring "&ه<<<ۀ<<<هٔ<<*ەہھةۃ"
+  tailoring "&ی<<*ىےيېۍ<<یٔ<<<ىٔ<<<ئ"
+  tailoring "&\u{00A0}<<\u{200C}<<\u{200D}"
+  return collator_obj
+end
+
+languages.pt = function(collator_obj)
+  return collator_obj
+end
+
+languages.ro = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<ă<<<Ă<â<<<Â"
+  tailoring "&I<î<<<Î"
+  tailoring "&S<ş=ș<<<Ş=Ș"
+  tailoring "&T<ţ=ț<<<Ţ=Ț"
+  return collator_obj
+end
+
 languages.ru = function(collator_obj)
   collator_obj:reorder{ "cyrillic" }
   return collator_obj
 end
 
+
+languages.se = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&b<á<<<Á"
+  tailoring "&d<č<<<Č<ʒ<<<Ʒ<ǯ<<<Ǯ"
+  tailoring "&e<đ<<<Đ<<ð<<<Ð"
+  tailoring "&h<ǧ<<<Ǧ<ǥ<<<Ǥ"
+  tailoring "&l<ǩ<<<Ǩ"
+  tailoring "&o<ŋ<<<Ŋ<<ń<<<Ń<<ñ<<<Ñ"
+  tailoring "&t<š<<<Š"
+  tailoring "&u<ŧ<<<Ŧ<<þ<<<Þ"
+  tailoring "&y<<ü<<<Ü<<ű<<<Ű"
+  tailoring "&ǀ<ž<<<Ž<ø<<<Ø<<œ<<<Œ<æ<<<Æ<å<<<Å<<ȧ<<<Ȧ<ä<<<Ä<<ã<<<Ã<ö<<<Ö<<ő<<<Ő<<õ<<<Õ<<ô<<<Ô<<ǫ<<<Ǫ"
+  return collator_obj
+end
+
+languages.si = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"sinhala","devanagari", "bengali", "gurmukhi", "gujarati", "oriya", "tamil", "telugu", "kannada", "malayalam"}
+  tailoring "&ඖ<ං<ඃ"
+  tailoring "&ඥ<ඤ"
+  return collator_obj
+end
+
+languages.sk = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<ä<<<Ä"
+  tailoring "&C<č<<<Č"
+  tailoring "&H<ch<<<cH<<<Ch<<<CH"
+  tailoring "&O<ô<<<Ô"
+  tailoring "&R<ř<<<Ř"
+  tailoring "&S<š<<<Š"
+  tailoring "&Z<ž<<<Ž"
+  return collator_obj
+end
+
+
+languages.sl = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&C<č<<<Č"
+  tailoring "&S<š<<<Š"
+  tailoring "&Z<ž<<<Ž"
+  return collator_obj
+end
+
+languages.smn = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<â<<<Â<<à<<<À"
+  tailoring "&C<č<<<Č"
+  tailoring "&D<đ<<<Đ"
+  tailoring "&Ŋ<<ñ<<<Ñ<<ń<<<Ń"
+  tailoring "&S<š<<<Š"
+  tailoring "&Z<ž<<<Ž<æ<<<Æ<ø<<<Ø<å<<<Å<ã<<<Ã<ä<<<Ä<á<<<Á<ö<<<Ö"
+  return collator_obj
+end
+
+languages.sq = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&D<ç<<<Ç"
+  tailoring "&E<dh<<<Dh<<<DH"
+  tailoring "&F<ë<<<Ë"
+  tailoring "&H<gj<<<Gj<<<GJ"
+  tailoring "&M<ll<<<Ll<<<LL"
+  tailoring "&O<nj<<<Nj<<<NJ"
+  tailoring "&S<rr<<<Rr<<<RR"
+  tailoring "&T<sh<<<Sh<<<SH"
+  tailoring "&U<th<<<Th<<<TH"
+  tailoring "&Y<xh<<<Xh<<<XH"
+  tailoring "&Ʒ<zh<<<Zh<<<ZH"
+  return collator_obj
+end
+
 languages.sr = function(collator_obj)
   collator_obj:reorder{ "cyrillic" }
+  return collator_obj
+end
+
+languages.sr_latn = languages.hr
+
+languages.sv = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&D<<đ<<<Đ<<ð<<<Ð"
+  tailoring "&t<<<þ/h"
+  tailoring "&T<<<Þ/H"
+  tailoring "&v<<<V<<w<<<W"
+  tailoring "&Y<<ü<<<Ü<<ű<<<Ű"
+  tailoring "&ǀ<å<<<Å<ä<<<Ä<<æ<<<Æ<<ę<<<Ę<ö<<<Ö<<ø<<<Ø<<ő<<<Ő<<œ<<<Œ<<ô<<<Ô"
+  return collator_obj
+end
+
+languages.sw = function(collator_obj)
+  return collator_obj
+end
+
+
+languages.ta = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"tamil", "devanagari", "bengali", "gurmukhi", "gujarati", "oriya", "telugu", "kannada", "malayalam", "sinhala"}
+  tailoring  "&ஔ<ஂ<ஃ"
+  tailoring  "&ஹ<க்ஷ"
+  tailoring  "&க<க்"
+  tailoring  "&ங<ங்"
+  tailoring  "&ச<ச்"
+  tailoring  "&ஞ<ஞ்"
+  tailoring  "&ட<ட்"
+  tailoring  "&ண<ண்"
+  tailoring  "&த<த்"
+  tailoring  "&ந<ந்"
+  tailoring  "&ப<ப்"
+  tailoring  "&ம<ம்"
+  tailoring  "&ய<ய்"
+  tailoring  "&ர<ர்"
+  tailoring  "&ல<ல்"
+  tailoring  "&வ<வ்"
+  tailoring  "&ழ<ழ்"
+  tailoring  "&ள<ள்"
+  tailoring  "&ற<ற்"
+  tailoring  "&ன<ன்"
+  tailoring  "&ஜ<ஜ்"
+  tailoring  "&ஶ<ஶ்"
+  tailoring  "&ஷ<ஷ்"
+  tailoring  "&ஸ<ஸ்"
+  tailoring  "&ஹ<ஹ்"
+  tailoring  "&க்ஷ<க்ஷ்"
+  return collator_obj
+end
+
+languages.te = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"telugu", "devanagari", "bengali", "gurmukhi", "gujarati", "oriya", "tamil", "kannada", "malayalam", "sinhala"}
+  tailoring "&ఔ<ఁ<ం<ః"
+  return collator_obj
+end
+
+languages.th = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"thai"}
+  tailoring "&๚<ฯ"
+  tailoring "&๛<ๆ"
+  tailoring "&๎<<์"
+  tailoring "&ะ<ํ"
+  tailoring "&า<<<ๅ"
+  tailoring "&าํ<<<ํา<<<ำ"
+  tailoring "&ๅํ<<<ํๅ"
+  tailoring "&ไ<ฺ"
+  return collator_obj
+end
+
+languages.tk = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&C<ç<<<Ç"
+  tailoring "&E<ä<<<Ä"
+  tailoring "&J<ž<<<Ž"
+  tailoring "&N<ň<<<Ň"
+  tailoring "&O<ö<<<Ö"
+  tailoring "&S<ş<<<Ş"
+  tailoring "&U<ü<<<Ü"
+  tailoring "&Y<ý<<<Ý"
+  return collator_obj
+end
+
+languages.to = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&n<ng<<<Ng<<<NG<<<ŋ<<<Ŋ"
+  tailoring "&z<ʻ<<<ʽ"
+  tailoring "&a<<á<<<Á<<ā<<<Ā"
+  tailoring "&e<<é<<<É<<ē<<<Ē"
+  tailoring "&i<<í<<<Í<<ī<<<Ī"
+  tailoring "&o<<ó<<<Ó<<ō<<<Ō"
+  tailoring "&u<<ú<<<Ú<<ū<<<Ū"
+  return collator_obj
+end
+
+languages.tr = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&C<ç<<<Ç"
+  tailoring "&G<ğ<<<Ğ"
+  tailoring "&i<ı<<<I"
+  tailoring "&i<<<İ"
+  tailoring "&O<ö<<<Ö"
+  tailoring "&S<ş<<<Ş"
+  tailoring "&U<ü<<<Ü"
+  return collator_obj
+end
+
+languages.ug = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"arabic"}
+  tailoring "&ا<ە<ب"
+  tailoring "&ك<گ<ڭ<ل"
+  tailoring "&ھ<و<ۇ<ۆ<ۈ<ۋ<ې<ى<ي"
+  return collator_obj
+end
+
+languages.uk = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"cyrillic"}
+  tailoring "&Г<ґ<<<Ґ"
+  tailoring "&ꙇ<ї<<<\u{A676}<<<Ї"
+  return collator_obj
+end
+
+languages.ur = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"arabic"}
+  tailoring "&ا<<أ<آ<ب<بھ<پ<پھ<ت<تھ<ٹ<ٹھ<ث<ج<جھ<چ<چھ<ح<خ<د<دھ<ڈ<ڈھ<ذ<ر<رھ<ڑ<ڑھ<ز<ژ<س<ش<ص<ض<ط<ظ <ع<غ<ف<ق<ک<کھ<گ<گھ<ل<لھ<م<مھ<ن<نھ<ں<ںھ<و<<ؤ<وھ<ہ<<ۂ<ھ<ۃ<ء<ی<<ئ<یھ<ے<<ۓ"
+  tailoring "&\u{0652}<<\u{064E}<<\u{0650}<<\u{064F}<<\u{0670}<<\u{0656}<<\u{0657}<<\u{064B}<<\u{064D}<<\u{064C}<<\u{0654}<<\u{0651}<<\u{0658}<<\u{0653}"
+  tailoring "&<<<\u{0610}<<<\u{0611}<<<\u{0613}<<<\u{0612}<<<\u{0614}"
+  return collator_obj
+end
+
+languages.uz = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&[before 1]ʒ<oʻ=o‘=o''<<<Oʻ=O‘=O''"
+  tailoring "<gʻ=g‘=g''<<<Gʻ=G‘=G''"
+  tailoring "<sh<<<Sh<<<SH"
+  tailoring "<ch<<<Ch<<<CH"
+  return collator_obj
+end
+
+
+languages.vi = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&̀<<̉<<̃<<́<<̣"
+  tailoring "&a<ă<<<Ă<â<<<Â"
+  tailoring "&d<đ<<<Đ"
+  tailoring "&e<ê<<<Ê"
+  tailoring "&o<ô<<<Ô<ơ<<<Ơ"
+  tailoring "&u<ư<<<Ư"
+  return collator_obj
+end
+
+languages.vo = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<ä<<<Ä"
+  tailoring "&O<ö<<<Ö"
+  tailoring "&U<ü<<<Ü"
+  return collator_obj
+end
+
+languages.wae = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&á=aa"
+  tailoring "&ã=ää"
+  tailoring "&é=ee"
+  tailoring "&í=ii"
+  tailoring "&ó=oo"
+  tailoring "&õ=öö"
+  tailoring "&č=ch"
+  tailoring "&š=sch"
+  tailoring "&ú=uu"
+  tailoring "&ũ=üü"
+  return collator_obj
+end
+
+languages.wo = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&A<à<<<À"
+  tailoring "&E<é<<<É<ë<<<Ë"
+  tailoring "&N<ñ<<<Ñ<ŋ<<<Ŋ"
+  tailoring "&O<ó<<<Ó"
+  return collator_obj
+end
+
+languages.yi = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"hebrew"}
+  tailoring "&''<<׳"
+  tailoring "&'\"'<<״"
+  tailoring "&ב<בֿ"
+  tailoring "&ו<<וּ<<וו<<וי"
+  tailoring "&י<<יִ<<יי<<ײַ"
+  tailoring "&כ<כּ"
+  tailoring "&פ<פּ"
+  tailoring "&פֿ<<<ף"
+  tailoring "&ש<שׂ"
+  tailoring "&ת<תּ"
+  return collator_obj
+end
+
+languages.yo = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring "&E<ẹ<<<Ẹ"
+  tailoring "&G<gb<<<Gb<<<GB"
+  tailoring "&O<ọ<<<Ọ"
+  tailoring "&S<ṣ<<<Ṣ"
+  return collator_obj
+end
+
+languages.zj = function(collator_obj)
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  collator_obj:reorder{"han"}
+  -- tons of tailorings ommited
+  return collator_obj
+end
+
+languages.zu = function(collator_obj)
   return collator_obj
 end
 
