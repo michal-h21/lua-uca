@@ -2,6 +2,11 @@
 local math = require "math"
 local tailoring_lib = require "lua-uca.lua-uca-tailoring"
 local reordering_table = require "lua-uca.lua-uca-reordering-table"
+local uni_normalize
+-- in LuaTeX, load the lua-uni-normalize library
+if kpse then
+  uni_normalize = require "lua-uni-normalize"
+end
 
 local collator = {}
 collator.__index = collator
@@ -213,9 +218,20 @@ function collator:compare(a, b)
   return #a < #b
 end
 
+local codepoints_cache = {}
+
 function collator:string_to_codepoints(a)
+  if codepoints_cache[a] then return codepoints_cache[a] end
+  -- try unicode normalization, if it is available
+  -- it uses libraries available in LuaTeX, so it doesn't work with 
+  -- stock Lua
+  local normalized = a
+  if uni_normalize then 
+    normalized = uni_normalize.NFC(a) 
+  end
   local codepoints = {}
-  for _, code in utf8.codes(a) do codepoints[#codepoints+1] = code end
+  for _, code in utf8.codes(normalized) do codepoints[#codepoints+1] = code end
+  codepoints_cache[a] = codepoints
   return codepoints
 end
 
