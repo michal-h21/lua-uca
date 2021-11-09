@@ -1,5 +1,10 @@
 # Changelog
 
+2021-11-09
+
+  - cache string to codepoint conversion.
+  - use NFC normalization with LuaTeX.
+
 2021-09-16
 
   - version `0.1a` released.
