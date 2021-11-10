@@ -1,5 +1,9 @@
 # Changelog
 
+2021-11-10
+
+  - version `0.1b` released.
+
 2021-11-09
 
   - cache string to codepoint conversion.
