@@ -244,11 +244,12 @@ local codepoints_cache = {}
 function collator:string_to_codepoints(a)
   if codepoints_cache[a] then return codepoints_cache[a] end
   -- try unicode normalization, if it is available
-  -- it uses libraries available in LuaTeX, so it doesn't work with 
+  -- it uses libraries available in LuaTeX, so it doesn't work with
   -- stock Lua
   local normalized = a
-  if uni_normalize then 
-    normalized = uni_normalize.NFC(a) 
+  if uni_normalize then
+    -- it seems that normalization doesn't work correctly
+    -- normalized = uni_normalize.NFD(a)
   end
   local codepoints = {}
   for _, code in utf8.codes(normalized) do codepoints[#codepoints+1] = code end
