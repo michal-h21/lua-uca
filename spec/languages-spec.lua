@@ -58,7 +58,7 @@ describe("Test language support", function()
   it("should support French sorting", function()
     local french = collator.new(ducet)
     languages.fr(french)
-    local t = {"bohème", "Bohême", "Bohémien","Bohemien","gëne", "gène", "gêne", "gêné", }
+    local t = {"bohème", "Bohême", "Bohémien","Bohemien","gëne", "gène", "gêne", "gêné",  "tire-bouchon", "tire-d'aile", "tirefond"}
     table.sort(t, function(a,b)
       return french:compare_strings(a,b)
     end)
