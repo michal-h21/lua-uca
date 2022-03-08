@@ -86,7 +86,7 @@ function collator:read_weight(codepoints, pos)
     -- if we go out of the codepoint array
     if not newcodepoint then return nil end
     local child = children[newcodepoint]
-    if child then 
+    if child then
       local nextchild, nextpos = read_children(child, newpos)
       if nextchild then return nextchild, nextpos end
       if child.value then return child.value, newpos end
@@ -106,7 +106,7 @@ end
 
 -- get weights for the next characters
 function collator:get_weights(codepoints, pos)
-  local weights, next_pos = self:read_weight(codepoints, pos) 
+  local weights, next_pos = self:read_weight(codepoints, pos)
   -- return implicit weights for codepoints that are not in the database
   if not weights then
     weights, next_pos = self:get_implicit_weight(codepoints, pos)
@@ -127,7 +127,7 @@ function collator:get_lowest_char(codepoints, pos)
   local function get_lowest_key(tbl)
     local minimal, maximal = minimal, maximal
     if tbl.minimal then return tbl.minimal, tbl.maximal end
-    for k,v in pairs(tbl) do 
+    for k,v in pairs(tbl) do
       minimal,maximal = min(k, minimal), max(k, maximal)
     end
     tbl.minimal, tbl.maximal = minimal, maximal
@@ -152,7 +152,7 @@ function collator:get_lowest_char(codepoints, pos)
 
 
   local weights, next_pos = self:read_weight(codepoints, pos)
-  local x 
+  local x
   if weights then
     local weight_to_char = self.weight_to_char or self:weight_to_codepoints()
     self.weight_to_char = weight_to_char
@@ -265,7 +265,7 @@ end
 
 
 --- change sorting ordering
--- 
+--
 function collator:tailor(base, target, tailoring_table)
   -- get the value of the base character
   local value = self:get_weights(base, 1)
@@ -306,12 +306,12 @@ end
 -- expand characters to another characters
 function collator:equal(base, target)
   local new_weight = {}
-  local values, pos 
+  local values, pos
   pos = 1
   while true do
     value, pos = self:get_weights(target, pos)
-    for _, v in ipairs(value) do 
-      new_weight[#new_weight + 1] = v 
+    for _, v in ipairs(value) do
+      new_weight[#new_weight + 1] = v
     end
     if not pos then break end
   end
@@ -327,7 +327,7 @@ function collator:uppercase_first()
   self.tailoring_multiplier[3] = -1
   self.is_uppercase_first = true
   for k,v in ipairs(uppercase_values) do is_uppercase[v] = true end
-  
+
   local function change_case(element)
     local value =  element.value or {}
     for _, collation_element in ipairs(value) do
@@ -339,8 +339,8 @@ function collator:uppercase_first()
     end
     -- recursivelly process children
     local children = element.children or {}
-    for x, child in pairs(children) do 
-      change_case(child) 
+    for x, child in pairs(children) do
+      change_case(child)
     end
   end
   for _, element in pairs(self.codes) do
