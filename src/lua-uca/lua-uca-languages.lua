@@ -271,7 +271,23 @@ languages.fo = function(collator_obj)
   tailoring "&ǀ<æ<<<Æ<<ä<<<Ä<<ę<<<Ę<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<<œ<<<Œ<å<<<Å<<<aa<<<Aa<<<AA"
 end
 
+
 languages.fr = function(collator_obj)
+  -- reverse search for accents in French:
+  collator_obj.accents_backward = true
+  -- accents: sorting order in French
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring("&a<<à<<â")
+  tailoring("&e<<é<<è<<ê<<ë")
+  tailoring("&i<<î<<ï")
+  tailoring("&o<<ô<<ö")
+  tailoring("&u<<ù<<û<<ü")
+  tailoring("&y<<ÿ")
+  tailoring("&ae<æ<<<Æ")
+  tailoring("&oe<œ<<<Œ")
+  tailoring("&th<þ<<<Þ")       -- Canadian, see SGQRI004.pdf
+  -- lowercase before uppercase in French
+  --collator_obj:uppercase_first()
   return collator_obj
 end
 
