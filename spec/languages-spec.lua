@@ -1,3 +1,9 @@
+if kpse then
+  -- when we run this test with texlua
+  require "busted.runner" ()
+  kpse.set_program_name "luatex"
+end
+
 local ducet = require "lua-uca.lua-uca-ducet"
 local collator = require "lua-uca.lua-uca-collator"
 local languages = require "lua-uca.lua-uca-languages"
@@ -48,6 +54,20 @@ describe("Test language support", function()
     local first_char = norsk:get_lowest_char(codepoints, 1)
     assert.same(utf8.char(table.unpack(first_char)), "c")
 
+  end)
+  it("should support French sorting", function()
+    local french = collator.new(ducet)
+    languages.fr(french)
+    local t = {"bohème", "Bohême", "Bohémien","Bohemien","gëne", "gène", "gêne", "gêné", }
+    table.sort(t, function(a,b)
+      return french:compare_strings(a,b)
+    end)
+    -- make table where words point to their position in the sorced table
+    local reversed = {}
+    for i, x in ipairs(t) do
+      reversed[x] = i
+      print(x)
+    end
   end)
 
 end)
