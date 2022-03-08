@@ -187,21 +187,42 @@ end
 function collator:make_sort_key(codepoints)
   local levels = {}
   local pos = 1
-  local weights 
+  local weights
   local sort_key = {}
   while true do
-    -- 
+    --
     weights, pos = self:get_weights(codepoints, pos)
     levels = self:update_levels(levels, weights)
     -- break when we reach end of the codepoints array
     if not pos then break end
   end
-  for i, elements in ipairs(levels) do 
+  for i, elements in ipairs(levels) do
     for _, element in ipairs(elements) do
       table.insert(sort_key, element)
     end
     -- zero separates levels in the sort key
     table.insert(sort_key, 0)
+  end
+  -- (df) Reverse sort for accents?
+  if self.accents_backward then
+    local start,stop
+    local i = 1
+    repeat
+      if sort_key[i] == 0 then
+        if start then
+          stop = i-1
+        else
+          start = i+1
+        end
+      end
+      i = i+1
+    until stop or not sort_key[i]
+    -- swap secondary values
+    while start and stop and stop > start do
+      sort_key[start], sort_key[stop] = sort_key[stop], sort_key[start]
+      start = start+1
+      stop = stop-1
+    end
   end
   return sort_key
 end
@@ -209,7 +230,7 @@ end
 function collator:compare(a, b)
   -- sort using sort keys
   local min = math.min(#a, #b)
-  for i = 1, min do 
+  for i = 1, min do
     if a[i] ~= b[i] then return a[i] < b[i] end
   end
   -- this should happen only when the strings are equal
