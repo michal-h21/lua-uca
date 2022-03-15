@@ -273,8 +273,14 @@ end
 
 
 languages.fr = function(collator_obj)
+  -- French uses default sorting rules by default
+  return collator_obj
+end
+
+languages.fr_ca = function(collator_obj)
+  -- alternative sorting for Cannadian French
   -- reverse search for accents in French:
-  -- collator_obj.accents_backward = true
+  collator_obj.accents_backward = true
   -- accents: sorting order in French
   local tailoring = function(s) collator_obj:tailor_string(s) end
   tailoring("&a<<à<<â")
@@ -290,6 +296,8 @@ languages.fr = function(collator_obj)
   --collator_obj:uppercase_first()
   return collator_obj
 end
+
+
 
 languages.ga = function(collator_obj)
   return collator_obj
