@@ -68,6 +68,9 @@ describe("Test language support", function()
       reversed[x] = i
       print(x)
     end
+    -- test strange rules, where sorting of accents goes from end of the word forward
+    assert.truthy(reversed["gêne"] < reversed["gëne"])
+    assert.truthy(reversed["gëne"] < reversed["gêné"])
   end)
 
 end)
