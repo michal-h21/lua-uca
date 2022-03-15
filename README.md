@@ -95,6 +95,11 @@ can be enabled using `collator_obj:uppercase_first()` function:
     tailoring("&ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA")
     tailoring("&oe<<œ<<<Œ")
 
+
+Some languages, for example Canadian French, sort accent backwards, like gêne < gëne < gêné. 
+In this case, you can set the `collator_obj.accents_backward` variable to `true`.
+
+
 % More information on a new language support is in the `HACKING.md`
 % document in the [`Lua-UCA` Github repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
 
@@ -115,6 +120,15 @@ In German or Czech, numbers should be sorted after all other characters. This ca
 
 The special keyword "others" means that the scripts that follows in the table
 will be sorted at the very end.
+
+## Unicode normalization
+
+By default, no Unicode normalization is used internally. You can explicitly request normalization that use the
+[Uninormalize package](https://ctan.org/pkg/uninormalize?lang=en). Note that it will significantly increase the
+procesing time. 
+
+There are two normalization methods, NFC and NFD. They can be enabled using
+`collation.use_nfc()` and `collation.use_nfd()` functions.
 
 
 # What is missing
