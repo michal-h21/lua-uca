@@ -11,6 +11,26 @@ end
 local collator = {}
 collator.__index = collator
 
+-- enable Unicode normalization
+local normalize_method = false
+
+function collator.use_nfc()
+  if uni_normalize then
+    normalize_method = "NFC"
+  else
+    return nil, "lua-uni-normalize is not available"
+  end
+end
+
+function collator.use_nfd()
+  if uni_normalize then
+    normalize_method = "NFD"
+  else
+    return nil, "lua-uni-normalize is not available"
+  end
+end
+
+
 local function copy_table(tbl)
   local t = {}
   for  k, v in pairs(tbl) do
@@ -247,9 +267,9 @@ function collator:string_to_codepoints(a)
   -- it uses libraries available in LuaTeX, so it doesn't work with
   -- stock Lua
   local normalized = a
-  if uni_normalize then
+  if normalize_method then
     -- it seems that normalization doesn't work correctly
-    -- normalized = uni_normalize.NFD(a)
+    normalized = uni_normalize[normalize_method](a)
   end
   local codepoints = {}
   for _, code in utf8.codes(normalized) do codepoints[#codepoints+1] = code end
