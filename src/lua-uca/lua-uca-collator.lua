@@ -142,6 +142,7 @@ function collator:get_lowest_char(codepoints, pos)
   -- find the lowest key in the table
   local min = math.min
   local max = math.max
+  local pos = pos or 1
   local minimal = 0xffffffffff
   local maximal = -0xfffffffff
   local function get_lowest_key(tbl)
