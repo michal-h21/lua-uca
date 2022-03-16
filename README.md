@@ -121,6 +121,28 @@ In German or Czech, numbers should be sorted after all other characters. This ca
 The special keyword "others" means that the scripts that follows in the table
 will be sorted at the very end.
 
+## Headers for index entries
+
+In some languages, for example Czech, multiple letters may count as one
+character. This is the case of the *ch* character. 
+
+Lua-UCA provides function `collator_obj:get_lowest_char()`. It returns table with UTF-8 codepoints 
+for correct first character for a given language that can be used for example as an index header.
+
+
+    local czech = collator.new(ducet)
+    languages.cs(czech)
+    -- first we need to convert string to codepoints
+    local codepoints = czech:string_to_codepoints("Chrobák")
+    local first_char = czech:get_lowest_char(codepoints)
+    -- it should print letters "ch"
+    print(utf8.char(table.unpack(first_char)))
+    -- you can also specify position of the character
+    local second_char = czech:get_lowest_char(codepoints, 2)
+    -- it should print letter "h", as it is second codepoint in the string
+    print(utf8.char(table.unpack(second_char)))
+
+
 ## Unicode normalization
 
 By default, no Unicode normalization is used internally. You can explicitly request normalization that use the
