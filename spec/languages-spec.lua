@@ -35,7 +35,10 @@ describe("Test language support", function()
     local codepoints = czech:string_to_codepoints("Chrobák")
     local first_char = czech:get_lowest_char(codepoints, 1)
     assert.same(utf8.char(table.unpack(first_char)), "ch")
-    local first_char = czech:get_lowest_char(codepoints, 6)
+    -- test without explicit position in the string
+    local first_char_nonexplicit = czech:get_lowest_char(codepoints)
+    assert.same(utf8.char(table.unpack(first_char_nonexplicit)), "ch")
+    local first_char = czech:get_lowest_char(codepoints, 6) 
     assert.same(utf8.char(table.unpack(first_char)), "a")
     -- č has distinct sort weight to c
     local codepoints = czech:string_to_codepoints("čáp")
