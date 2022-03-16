@@ -277,7 +277,7 @@ languages.fr = function(collator_obj)
   return collator_obj
 end
 
-languages.fr_ca = function(collator_obj)
+languages.fr_backward_accents = function(collator_obj)
   -- alternative sorting for Cannadian French
   -- reverse search for accents in French:
   collator_obj.accents_backward = true
