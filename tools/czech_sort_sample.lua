@@ -5,7 +5,7 @@ local collator = require "lua-uca.lua-uca-collator"
 local languages = require "lua-uca.lua-uca-languages"
 
 local collator_obj = collator.new(ducet)
-local tailoring = function(s) languages.tailor_string(collator_obj, s) end
+local tailoring = function(s) collator_obj:tailor_string(s) end
 
 tailoring "&c<č<<<Č"
 tailoring "&h<ch<<<cH<<<Ch<<<CH"
