@@ -1,5 +1,5 @@
 package = "lua-uca"
-version = "dev-1"
+version = "v0.1b"
 source = {
    url = "git+https://github.com/michal-h21/lua-uca.git"
 }
