@@ -1,11 +1,16 @@
 -- object for Unicode string collation
 local math = require "math"
-local tailoring_lib = require "lua-uca.lua-uca-tailoring"
-local reordering_table = require "lua-uca.lua-uca-reordering-table"
+local tailoring_lib
+local reordering_table
 local uni_normalize
--- in LuaTeX, load the lua-uni-normalize library
 if kpse then
+  tailoring_lib = require "lua-uca.lua-uca-tailoring"
+  reordering_table = require "lua-uca.lua-uca-reordering-table"
+  -- in LuaTeX, load the lua-uni-normalize library
   uni_normalize = require "lua-uni-normalize"
+else
+  tailoring_lib = require "lua-uca.tailoring"
+  reordering_table = require "lua-uca.reordering-table"
 end
 
 local collator = {}
