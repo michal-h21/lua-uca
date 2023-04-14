@@ -51,6 +51,9 @@ in Lua by Herbert Voß. It has built-in `Lua-UCA` support starting with version
 
      xindex -u -l no -c norsk filename.idx
 
+## Use with LuaJIT
+
+The default version of `lua-uca-ducet` fails with Luajit. You can use alternative version of this file, `lua-uca-ducet-jit`.
 
 ## Change sorting rules
 

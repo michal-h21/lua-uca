@@ -16,7 +16,7 @@ ifeq ($(strip $(shell git rev-parse --is-inside-work-tree 2>/dev/null)),true)
 endif
 
 
-all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-reordering-table.lua $(DOC_PDF)
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua $(DOC_PDF)
 
 
 
@@ -33,6 +33,9 @@ data/common:
 src/lua-uca/lua-uca-ducet.lua:
 	mkdir -p src/lua-uca
 	texlua tools/make_ducet.lua > src/lua-uca/lua-uca-ducet.lua
+
+src/lua-uca/lua-uca-ducet-jit.lua:
+	texlua tools/make_ducet_jit.lua > src/lua-uca/lua-uca-ducet-jit.lua
 
 src/lua-uca/lua-uca-reordering-table.lua:
 	mkdir -p src/lua-uca

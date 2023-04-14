@@ -1,6 +1,7 @@
 *.swp
 data/
 src/lua-uca/lua-uca-ducet.lua
+src/lua-uca/lua-uca-ducet-jit.lua
 src/lua-uca/lua-uca-reordering-table.lua
 *.log
 *.idx

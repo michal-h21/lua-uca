@@ -13,6 +13,12 @@ else
   reordering_table = require "lua-uca.reordering-table"
 end
 
+local utf8 = utf8
+if jit then
+  package.cpath = package.cpath .. ";?.dylib;?.so;?.dll"
+  utf8 = require "lua-utf8" -- https://github.com/starwing/luautf8.git
+end
+
 local collator = {}
 collator.__index = collator
 

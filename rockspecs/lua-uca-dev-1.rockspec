@@ -18,6 +18,7 @@ build = {
    modules = {
       ["lua-uca.collator"] = "src/lua-uca/lua-uca-collator.lua",
       ["lua-uca.ducet"] = "src/lua-uca/lua-uca-ducet.lua",
+      ["lua-uca.ducet-jit"] = "src/lua-uca/lua-uca-ducet-jit.lua",
       ["lua-uca.languages"] = "src/lua-uca/lua-uca-languages.lua",
       ["lua-uca.reordering-table"] = "src/lua-uca/lua-uca-reordering-table.lua",
       ["lua-uca.tailoring"] = "src/lua-uca/lua-uca-tailoring.lua"
