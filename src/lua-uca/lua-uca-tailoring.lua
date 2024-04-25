@@ -164,11 +164,20 @@ local function tailor_string(collator_obj, str)
   local function tailor_secondary(a,b) tailor(a,b, secondary_tailoring) end
   local function tailor_tertiary(a,b) tailor(a,b, tertiary_tailoring) end
   local functions = {["<"] = tailor_primary, ["<<"] = tailor_secondary, ["<<<"] = tailor_tertiary, ["="] = tailor_equal}
-  local first = str:match("^&?([^%<^%=]+)")
-  for fn, second in str:gmatch("([<=]+)([^<^%=]+)") do
-    local exec = functions[fn]
-    exec(first, second)
-    first = second -- set the current second object as first for the next round
+  local first = str:match("^&?([^%<^%=%*]+)")
+  for fn, second in str:gmatch("([<=*]+)([^<^%=%*]+)") do
+    if fn:match("%*$") then  -- Ending with "*" like "<*"
+      fn = fn:sub(1, -2)
+      local exec = functions[fn]
+      for char in second:gmatch(utf8.charpattern) do
+        exec(first, char)
+        first = char
+      end
+    else
+      local exec = functions[fn]
+      exec(first, second)
+      first = second -- set the current second object as first for the next round
+    end
   end
 end
 

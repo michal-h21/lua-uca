@@ -76,4 +76,18 @@ describe("Test language support", function()
     assert.truthy(reversed["gëne"] < reversed["gêné"])
   end)
 
+  it("should support Chinese sorting", function()
+    local chinese = collator.new(ducet)
+    languages.zh(chinese)
+    local t = {
+      "一",  -- U+4E00, yi
+      "丁",  -- U+4E01, ding
+      "七",  -- U+4E03, qi
+    }
+    table.sort(t, function(a,b)
+      return chinese:compare_strings(a,b)
+    end)
+    assert.same(t, {"丁", "七", "一"})
+  end)
+
 end)
