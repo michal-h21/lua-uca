@@ -20,6 +20,7 @@ build = {
       ["lua-uca.ducet"] = "src/lua-uca/lua-uca-ducet.lua",
       ["lua-uca.ducet-jit"] = "src/lua-uca/lua-uca-ducet-jit.lua",
       ["lua-uca.languages"] = "src/lua-uca/lua-uca-languages.lua",
+      ["lua-uca.chinese"] = "src/lua-uca/lua-uca-chinese.lua",
       ["lua-uca.reordering-table"] = "src/lua-uca/lua-uca-reordering-table.lua",
       ["lua-uca.tailoring"] = "src/lua-uca/lua-uca-tailoring.lua"
    }
