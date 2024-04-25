@@ -9,8 +9,8 @@ if kpse then
   -- in LuaTeX, load the lua-uni-normalize library
   uni_normalize = require "lua-uni-normalize"
 else
-  tailoring_lib = require "lua-uca.lua-uca-tailoring"
-  reordering_table = require "lua-uca.lua-uca-reordering-table"
+  tailoring_lib = require "lua-uca.tailoring"
+  reordering_table = require "lua-uca.reordering-table"
 end
 
 local utf8 = utf8
