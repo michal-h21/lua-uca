@@ -44,6 +44,7 @@ src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt
 .PHONY: test install
 
 test:
+	luarocks make --local
 	busted spec/ducet-spec.lua
 	busted spec/collator_spec.lua
 	busted spec/languages-spec.lua
