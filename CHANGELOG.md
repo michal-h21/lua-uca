@@ -1,5 +1,10 @@
 # Changelog
 
+2024-05-04
+
+  - fixed Chinese support (thanks to Zeping Lee).
+  - version `0.1c` released.
+
 2022-03-08
 
   - working on better French support (thanks to Daniel Flipo).
