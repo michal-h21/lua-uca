@@ -2,7 +2,7 @@
 # The `Lua-UCA` package
 \fi
 
-This package adds support for the [Unicode collation algorithm](https://unicode.org/reports/tr10/) for Lua 5.3. 
+This package adds support for the [Unicode collation algorithm](https://unicode.org/reports/tr10/) for Lua 5.3 and later. 
 It is mainly intended for use with Lua\TeX and working \TeX\ distribution, but it can work also as a standalone
 Lua module. You will need to install a required [Lua-uni-algos](https://github.com/latex3/lua-uni-algos) package by hand
 in that case.
@@ -167,7 +167,7 @@ There are two normalization methods, NFC and NFD. They can be enabled using
 \iffalse
 # Copyright
 
-Michal Hoftich, 2021. See LICENSE file for more details.
+Michal Hoftich, 2021–2024. See LICENSE file for more details.
 
 
 \fi
