@@ -273,24 +273,22 @@ end
 
 
 languages.fr = function(collator_obj)
-  -- French uses default sorting rules by default
+  -- accents: sorting order in French
+  local tailoring = function(s) collator_obj:tailor_string(s) end
+  tailoring("&æ=ae")
+  tailoring("&œ=oe")
+  tailoring("&th<þ<<<Þ")       -- Canadian, see SGQRI004.pdf
   return collator_obj
 end
 
+
 languages.fr_backward_accents = function(collator_obj)
-  -- alternative sorting for Cannadian French
-  -- reverse search for accents in French:
+   -- reverse search for accents in French (recommended):
   collator_obj.accents_backward = true
   -- accents: sorting order in French
   local tailoring = function(s) collator_obj:tailor_string(s) end
-  tailoring("&a<<à<<â")
-  tailoring("&e<<é<<è<<ê<<ë")
-  tailoring("&i<<î<<ï")
-  tailoring("&o<<ô<<ö")
-  tailoring("&u<<ù<<û<<ü")
-  tailoring("&y<<ÿ")
-  tailoring("&ae<æ<<<Æ")
-  tailoring("&oe<œ<<<Œ")
+  tailoring("&æ=ae")
+  tailoring("&œ=oe")
   tailoring("&th<þ<<<Þ")       -- Canadian, see SGQRI004.pdf
   -- lowercase before uppercase in French
   --collator_obj:uppercase_first()

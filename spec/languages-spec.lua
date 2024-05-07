@@ -61,7 +61,7 @@ describe("Test language support", function()
   it("should support French sorting", function()
     local french = collator.new(ducet)
     languages.fr_backward_accents(french)
-    local t = {"bohème", "Bohême", "Bohémien","Bohemien","gëne","gene", "géne", "gène", "gêne", "gêné",  "tire-bouchon", "tire-d'aile", "tirefond"}
+    local t = {"bohème", "Bohême", "Bohémien","Bohemien","gëne","gene", "géne", "gène", "gêne", "gêné",  "tire-bouchon", "tire-d'aile", "tirefond", "COTÉ", "Coté", "Côté"}
     table.sort(t, function(a,b)
       return french:compare_strings(a,b)
     end)
@@ -74,6 +74,8 @@ describe("Test language support", function()
     -- test strange rules, where sorting of accents goes from end of the word forward
     assert.truthy(reversed["gêne"] < reversed["gëne"])
     assert.truthy(reversed["gëne"] < reversed["gêné"])
+    assert.truthy(reversed["Coté"] < reversed["COTÉ"])
+    assert.truthy(reversed["COTÉ"] < reversed["Côté"])
   end)
 
   it("should support Chinese sorting", function()
