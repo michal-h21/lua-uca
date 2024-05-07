@@ -1,5 +1,9 @@
 # Changelog
 
+2024-05-07
+
+  - fixed French support (thanks to Daniel Flipo).
+
 2024-05-04
 
   - fixed Chinese support (thanks to Zeping Lee).
