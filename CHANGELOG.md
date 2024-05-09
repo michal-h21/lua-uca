@@ -1,8 +1,13 @@
 # Changelog
 
+2024-05-09
+
+  - version `0.1d` released.
+
 2024-05-07
 
   - fixed French support (thanks to Daniel Flipo).
+ 
 
 2024-05-04
 
