@@ -1,5 +1,9 @@
 # Changelog
 
+2025-03-31
+
+  - fixed `de_din2` sorting rules (thanks to Herbert Voss).
+
 2024-05-09
 
   - version `0.1d` released.
