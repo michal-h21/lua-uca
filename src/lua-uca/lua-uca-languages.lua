@@ -158,6 +158,11 @@ languages.de_din2 = function(collator_obj)
   languages.de(collator_obj)
   tailoring "&Ö=Oe"
   tailoring "&ö=oe"
+  tailoring "&Ä=Ae"
+  tailoring "&ä=ae"
+  tailoring "&Ü=Ue"
+  tailoring "&ü=ue"
+  tailoring "&ß=ss"
   return collator_obj
 end
 
