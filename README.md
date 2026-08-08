@@ -55,6 +55,10 @@ in Lua by Herbert Voß. It has built-in `Lua-UCA` support starting with version
 
 The default version of `lua-uca-ducet` fails with Luajit. You can use alternative version of this file, `lua-uca-ducet-jit`.
 
+## Use with OpTeX
+See [OpTeX trick 187](https://petr.olsak.net/optex/optex-tricks.html#ucasort) for instructions
+on how to use `lua-uca` to sort the index, bibliography and more in OpTeX.
+
 ## Change sorting rules
 
 The simplest way to change the default sorting order is to use the
