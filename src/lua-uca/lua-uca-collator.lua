@@ -25,8 +25,9 @@ end
 local collator = {}
 collator.__index = collator
 
--- enable Unicode normalization
-local normalize_method = false
+-- Unicode normalization: the UCA requires NFD, used by default when
+-- lua-uni-normalize is available
+local normalize_method = uni_normalize and "NFD" or false
 
 function collator.use_nfc()
   if uni_normalize then
@@ -227,6 +228,14 @@ function collator:get_lowest_char(codepoints, pos)
     -- traverse the tree to find the codepoint with the lowest weight
     x = find_codepoints(current)
   end
+  -- the result is meant for display, return it in NFC
+  if x and uni_normalize then
+    local composed = {}
+    for _, code in utf8.codes(uni_normalize.NFC(utf8.char(table.unpack(x)))) do
+      composed[#composed + 1] = code
+    end
+    x = composed
+  end
   return x, next_pos
 end
 
@@ -313,7 +322,6 @@ function collator:string_to_codepoints(a)
   -- stock Lua
   local normalized = a
   if normalize_method then
-    -- it seems that normalization doesn't work correctly
     normalized = uni_normalize[normalize_method](a)
   end
   local codepoints = {}

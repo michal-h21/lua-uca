@@ -138,6 +138,7 @@ character. This is the case of the *ch* character.
 
 Lua-UCA provides function `collator_obj:get_lowest_char()`. It returns table with UTF-8 codepoints 
 for correct first character for a given language that can be used for example as an index header.
+When normalization is used, the characters are returned in NFC.
 
 
     local czech = collator.new(ducet)
@@ -155,12 +156,13 @@ for correct first character for a given language that can be used for example as
 
 ## Unicode normalization
 
-By default, no Unicode normalization is used internally. You can explicitly request normalization that use the
-[Uninormalize package](https://ctan.org/pkg/uninormalize?lang=en). Note that it will significantly increase the
-procesing time. 
+Strings are normalized to NFD before collation, as the Unicode Collation
+Algorithm requires, using the `lua-uni-normalize` library from the
+[lua-uni-algos package](https://ctan.org/pkg/lua-uni-algos). It is loaded
+in LuaTeX; with stock Lua, no normalization is used.
 
-There are two normalization methods, NFC and NFD. They can be enabled using
-`collation.use_nfc()` and `collation.use_nfd()` functions.
+The normalization method can be changed using the `collation.use_nfc()` and
+`collation.use_nfd()` functions.
 
 
 # What is missing
