@@ -42,6 +42,16 @@ describe("collator test suite",function()
     assert.truthy(pos == 3)
 
   end)
+  it("discontiguous contractions should work", function()
+    -- alef + madda above (U+0653) is a contraction, U+0591 (class 220)
+    -- between them doesn't block it
+    local contraction = collator_obj:make_sort_key({0x0627, 0x0653, 0x0591})
+    assert.same(contraction, collator_obj:make_sort_key({0x0627, 0x0591, 0x0653}))
+    -- U+0592 has the same class as U+0653 (230) and blocks it
+    local blocked = collator_obj:make_sort_key({0x0627, 0x0592, 0x0653})
+    local unblocked = collator_obj:make_sort_key({0x0627, 0x0653, 0x0592})
+    assert.truthy(collator_obj:compare(blocked, unblocked) or collator_obj:compare(unblocked, blocked))
+  end)
   it("should make sort keys", function()
     local codepoints = {0x0FB2, 0x0F80, string.byte("a")}
     local sort_key = collator_obj:make_sort_key(codepoints)

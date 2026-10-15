@@ -3,17 +3,20 @@ local math = require "math"
 local tailoring_lib
 local reordering_table
 local implicit
+local ccc
 local uni_normalize
 if kpse then
   tailoring_lib = require "lua-uca.lua-uca-tailoring"
   reordering_table = require "lua-uca.lua-uca-reordering-table"
   implicit = require "lua-uca.lua-uca-implicit"
+  ccc = require "lua-uca.lua-uca-ccc"
   -- in LuaTeX, load the lua-uni-normalize library
   uni_normalize = require "lua-uni-normalize"
 else
   tailoring_lib = require "lua-uca.tailoring"
   reordering_table = require "lua-uca.reordering-table"
   implicit = require "lua-uca.implicit"
+  ccc = require "lua-uca.ccc"
 end
 
 local utf8 = utf8
@@ -152,33 +155,65 @@ function collator:read_weight(codepoints, pos)
     if not newcodepoint then return nil end
     local child = children[newcodepoint]
     if child then
-      local nextchild, nextpos = read_children(child, newpos)
-      if nextchild then return nextchild, nextpos end
-      if child.value then return child.value, newpos end
+      local nextchild, nextpos, nextnode = read_children(child, newpos)
+      if nextchild then return nextchild, nextpos, nextnode end
+      if child.value then return child.value, newpos, child end
     end
     return nil
   end
-  local weights, new_pos
+  local weights, new_pos, node
   local current_codepoint = codepoints[pos]
   local codes = self.codes[current_codepoint]
   if not codes then return nil, pos + 1 end
   -- first try to read contractions
-  weights, new_pos = read_children(codes, pos)
-  if weights then return weights, new_pos + 1 end
-  -- if no contraction, weights are in the value field
-  return codes.value, pos + 1
+  weights, new_pos, node = read_children(codes, pos)
+  if not weights then
+    -- if no contraction, weights are in the value field
+    weights, new_pos, node = codes.value, pos, codes
+  end
+  if not weights then return nil, pos + 1 end
+  -- discontiguous contractions (UTS #10, S2.1.1-S2.1.3): an unblocked
+  -- non-starter after the match extends it when the longer string is in the
+  -- database, and is removed from the codepoints
+  local removed
+  local i = new_pos + 1
+  local blocking = 0 -- the highest combining class skipped
+  while node.children do
+    local codepoint = codepoints[i]
+    local class = codepoint and ccc[codepoint]
+    if not class then break end
+    local child = node.children[codepoint]
+    if child and child.value and blocking < class then
+      weights, node = child.value, child
+      removed = removed or {}
+      removed[i] = true
+    elseif class > blocking then
+      blocking = class
+    end
+    i = i + 1
+  end
+  if removed then
+    local remaining = {}
+    for j = 1, #codepoints do
+      if not removed[j] then remaining[#remaining + 1] = codepoints[j] end
+    end
+    return weights, new_pos + 1, remaining
+  end
+  return weights, new_pos + 1
 end
 
 -- get weights for the next characters
+-- when a discontiguous contraction was matched, the codepoints without the
+-- removed characters are returned as the third value
 function collator:get_weights(codepoints, pos)
-  local weights, next_pos = self:read_weight(codepoints, pos)
+  local weights, next_pos, remaining = self:read_weight(codepoints, pos)
   -- return implicit weights for codepoints that are not in the database
   if not weights then
     weights, next_pos = self:get_implicit_weight(codepoints, pos)
   end
   -- don't step next_pos if it is larger than size of the codepoints array
-  if next_pos > #codepoints then next_pos = nil end
-  return weights, next_pos
+  if next_pos > #(remaining or codepoints) then next_pos = nil end
+  return weights, next_pos, remaining
 end
 
 -- get characters with lowest weight at the given point of the codepoint array
@@ -261,11 +296,12 @@ end
 function collator:make_sort_key(codepoints)
   local levels = {}
   local pos = 1
-  local weights
+  local weights, remaining
   local sort_key = {}
   while true do
     --
-    weights, pos = self:get_weights(codepoints, pos)
+    weights, pos, remaining = self:get_weights(codepoints, pos)
+    codepoints = remaining or codepoints
     levels = self:update_levels(levels, weights)
     -- break when we reach end of the codepoints array
     if not pos then break end
