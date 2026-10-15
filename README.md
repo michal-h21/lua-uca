@@ -7,6 +7,8 @@ It is mainly intended for use with Lua\TeX and working \TeX\ distribution, but i
 Lua module. You will need to install a required [Lua-uni-algos](https://github.com/latex3/lua-uni-algos) package by hand
 in that case.
 
+It conforms to the Unicode Collation Algorithm version 18.0.0.
+
 
 ## Usage
 
@@ -108,6 +110,12 @@ can be enabled using `collator_obj:uppercase_first()` function:
 
 Some languages, for example Canadian French, sort accent backwards, like gêne < gëne < gêné. 
 In this case, you can set the `collator_obj.accents_backward` variable to `true`.
+
+Spaces, punctuation and most symbols are variable characters. By default,
+they are sorted as the other characters (`"non-ignorable"`). Set the
+`collator_obj.variable_weighting` variable to `"shifted"` to ignore them,
+unless the strings are otherwise equal, so that "de luge", "de-luge" and
+"deluge" sort together, or to `"blanked"` to ignore them completely.
 
 
 % More information on a new language support is in the `HACKING.md`

@@ -292,47 +292,105 @@ end
 
 
 
+-- the primary weight of U+FFFE, which separates the segments for backward
+-- levels (UTS #10, 10.1.5)
+local segment_separator = 0x0200
+
+-- variable weighting (UTS #10, section 4): collator_obj.variable_weighting is
+-- "non-ignorable" (the default), "shifted" or "blanked"
+-- the weights of the variable collation elements and of the ignorable ones
+-- after them are reset to zero; shifted adds a quaternary level, with the
+-- old primary weight of the variable collation elements, FFFF for the
+-- other non-ignorable ones
+local function variable_weights(weights, levels, shifted, after_variable)
+  local new = {}
+  for i, element in ipairs(weights) do
+    local reset, quaternary
+    if element.type == "*" and element[1] ~= 0 then
+      -- variable collation element
+      reset, quaternary, after_variable = true, element[1], true
+    elseif element[1] == 0 then
+      -- ignorable collation element
+      if after_variable then
+        reset, quaternary = true, 0
+      else
+        local completely_ignorable = true
+        for level = 2, levels do
+          if element[level] ~= 0 then completely_ignorable = false end
+        end
+        reset, quaternary = false, completely_ignorable and 0 or 0xFFFF
+      end
+    else
+      reset, quaternary, after_variable = false, 0xFFFF, false
+    end
+    local changed = {}
+    for level = 1, levels do
+      changed[level] = reset and 0 or element[level]
+    end
+    if shifted then changed[levels + 1] = quaternary end
+    new[i] = changed
+  end
+  return new, after_variable
+end
+
 -- make sort key from codepoints array (it can be created using the utf8.codes() function
 function collator:make_sort_key(codepoints)
   local levels = {}
   local pos = 1
   local weights, remaining
   local sort_key = {}
+  -- positions of the U+FFFE weights in the secondary level
+  local separators = {}
+  -- the number of levels in the collation elements
+  local element_levels = self.is_uppercase_first and 4 or 3
+  local variable = self.variable_weighting
+  if variable == "non-ignorable" then variable = nil end
+  local after_variable = false
   while true do
     --
     weights, pos, remaining = self:get_weights(codepoints, pos)
     codepoints = remaining or codepoints
-    levels = self:update_levels(levels, weights)
+    if variable then
+      weights, after_variable = variable_weights(weights, element_levels, variable == "shifted", after_variable)
+    end
+    if self.accents_backward then
+      for _, element in ipairs(weights) do
+        if element[1] == segment_separator then
+          separators[#separators + 1] = #(levels[2] or {}) + 1
+        end
+        levels = self:update_levels(levels, {element})
+      end
+    else
+      levels = self:update_levels(levels, weights)
+    end
     -- break when we reach end of the codepoints array
     if not pos then break end
   end
-  for i, elements in ipairs(levels) do
-    for _, element in ipairs(elements) do
+  -- (df) Reverse sort for accents?
+  -- the secondary weights are reversed in each segment between the U+FFFE
+  -- weights (UTS #10, S3.6), the U+FFFE weights stay in place
+  if self.accents_backward and levels[2] then
+    local secondary = levels[2]
+    separators[#separators + 1] = #secondary + 1
+    local start = 1
+    for _, separator in ipairs(separators) do
+      local stop = separator - 1
+      while stop > start do
+        secondary[start], secondary[stop] = secondary[stop], secondary[start]
+        start = start + 1
+        stop = stop - 1
+      end
+      start = separator + 1
+    end
+  end
+  -- every level is in the sort key, also when it has no weights
+  local max_level = element_levels + (variable == "shifted" and 1 or 0)
+  for i = 1, max_level do
+    for _, element in ipairs(levels[i] or {}) do
       table.insert(sort_key, element)
     end
     -- zero separates levels in the sort key
     table.insert(sort_key, 0)
-  end
-  -- (df) Reverse sort for accents?
-  if self.accents_backward then
-    local start,stop
-    local i = 1
-    repeat
-      if sort_key[i] == 0 then
-        if start then
-          stop = i-1
-        else
-          start = i+1
-        end
-      end
-      i = i+1
-    until stop or not sort_key[i]
-    -- swap secondary values
-    while start and stop and stop > start do
-      sort_key[start], sort_key[stop] = sort_key[stop], sort_key[start]
-      start = start+1
-      stop = stop-1
-    end
   end
   return sort_key
 end

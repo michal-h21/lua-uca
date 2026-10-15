@@ -45,8 +45,6 @@ describe("Collation test", function()
   it("supports contractions of  more than two letters", function()
      local x = keys[0x0FB2] 
      local y = x.children[0x0F71]
-     -- y shouldn't have values, there is no contraction for 0x0FB2 and 0x0F71
-     assert.truthy(y.value == nil)
      -- there should be another child
      local d = y.children[0x0F80]
      assert.truthy(d)

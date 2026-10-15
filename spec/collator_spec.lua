@@ -52,6 +52,48 @@ describe("collator test suite",function()
     local unblocked = collator_obj:make_sort_key({0x0627, 0x0653, 0x0592})
     assert.truthy(collator_obj:compare(blocked, unblocked) or collator_obj:compare(unblocked, blocked))
   end)
+  it("backward secondary weights should be reversed in segments", function()
+    local backward = collator.new(ducet)
+    backward.accents_backward = true
+    -- the secondary level of the sort key, between the first two zeroes
+    local function secondary(codepoints)
+      local key = backward:make_sort_key(codepoints)
+      local level, zeroes = {}, 0
+      for _, weight in ipairs(key) do
+        if weight == 0 then
+          zeroes = zeroes + 1
+          if zeroes == 2 then break end
+        elseif zeroes == 1 then
+          level[#level + 1] = weight
+        end
+      end
+      return level
+    end
+    local function weight(codepoint) return backward:get_weights({codepoint}, 1)[1][2] end
+    -- a, acute, U+FFFE, b: the segment before U+FFFE is reversed alone
+    assert.same({weight(0x0301), weight(0x61), weight(0xFFFE), weight(0x62)},
+      secondary({0x61, 0x0301, 0xFFFE, 0x62}))
+    -- without U+FFFE the whole level is reversed
+    assert.same({weight(0x62), weight(0x0301), weight(0x61)}, secondary({0x61, 0x0301, 0x62}))
+  end)
+  it("variable weighting should work", function()
+    local function sorted(variable)
+      local c = collator.new(ducet)
+      c.variable_weighting = variable
+      local t = {"deluge", "de-luge", "demark", "de luge", "death"}
+      table.sort(t, function(a, b) return c:compare_strings(a, b) end)
+      return t, c
+    end
+    assert.same({"de luge", "de-luge", "death", "deluge", "demark"}, sorted("non-ignorable"))
+    assert.same({"de luge", "de-luge", "death", "deluge", "demark"}, sorted(nil))
+    -- shifted: space and hyphen are ignored up to the quaternary level
+    assert.same({"death", "de luge", "de-luge", "deluge", "demark"}, sorted("shifted"))
+    -- blanked: they are ignored
+    local _, blanked = sorted("blanked")
+    local key = function(s) return blanked:make_sort_key(blanked:string_to_codepoints(s)) end
+    assert.same(key("deluge"), key("de-luge"))
+    assert.same(key("deluge"), key("de luge"))
+  end)
   it("should make sort keys", function()
     local codepoints = {0x0FB2, 0x0F80, string.byte("a")}
     local sort_key = collator_obj:make_sort_key(codepoints)
