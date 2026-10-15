@@ -2,15 +2,18 @@
 local math = require "math"
 local tailoring_lib
 local reordering_table
+local implicit
 local uni_normalize
 if kpse then
   tailoring_lib = require "lua-uca.lua-uca-tailoring"
   reordering_table = require "lua-uca.lua-uca-reordering-table"
+  implicit = require "lua-uca.lua-uca-implicit"
   -- in LuaTeX, load the lua-uni-normalize library
   uni_normalize = require "lua-uni-normalize"
 else
   tailoring_lib = require "lua-uca.tailoring"
   reordering_table = require "lua-uca.reordering-table"
+  implicit = require "lua-uca.implicit"
 end
 
 local utf8 = utf8
@@ -101,10 +104,40 @@ function collator:weight_to_codepoints(codes)
   return weights
 end
 
+-- ranges for implicit weights, UTS #10 section 10.1.3, generated from the
+-- Unicode data of the DUCET (tools/make_implicit.lua)
+local core_han = implicit.core_han
+local other_han = implicit.other_han
+local implicit_blocks = implicit.blocks
+
+local function in_ranges(ranges, codepoint)
+  for _, range in ipairs(ranges) do
+    if codepoint >= range[1] and codepoint <= range[2] then return true end
+  end
+  return false
+end
+
 function collator:get_implicit_weight(codepoints, pos)
-  -- implicit weight is based on the codepoint value
+  -- implicit weight is based on the codepoint value: two collation elements,
+  -- [.AAAA.0020.0002][.BBBB.0000.0000]
   local codepoint = codepoints[pos]
-  return {{codepoint, 0,  0}}, pos + 1
+  local first, second
+  for _, block in ipairs(implicit_blocks) do
+    if codepoint >= block[1] and codepoint <= block[2] then
+      first, second = block[3], (codepoint - block[4]) | 0x8000
+      break
+    end
+  end
+  if not first then
+    local base = 0xFBC0
+    if in_ranges(core_han, codepoint) then
+      base = 0xFB40
+    elseif in_ranges(other_han, codepoint) then
+      base = 0xFB80
+    end
+    first, second = base + (codepoint >> 15), (codepoint & 0x7FFF) | 0x8000
+  end
+  return {{first, 0x20, 0x02}, {second, 0, 0}}, pos + 1
 end
 
 function collator:read_weight(codepoints, pos)
@@ -113,7 +146,7 @@ function collator:read_weight(codepoints, pos)
   local function read_children(parent, pos)
     local children = parent.children or {}
     local newpos = pos + 1
-    newcodepoint = codepoints[newpos]
+    local newcodepoint = codepoints[newpos]
     -- if we go out of the codepoint array
     if not newcodepoint then return nil end
     local child = children[newcodepoint]
@@ -124,7 +157,7 @@ function collator:read_weight(codepoints, pos)
     end
     return nil
   end
-  local weights
+  local weights, new_pos
   local current_codepoint = codepoints[pos]
   local codes = self.codes[current_codepoint]
   if not codes then return nil, pos + 1 end
@@ -360,7 +393,7 @@ end
 -- expand characters to another characters
 function collator:equal(base, target)
   local new_weight = {}
-  local values, pos
+  local value, pos
   pos = 1
   while true do
     value, pos = self:get_weights(target, pos)

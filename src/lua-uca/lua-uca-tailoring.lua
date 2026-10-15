@@ -72,7 +72,7 @@ local function renumber_blocks(blocks, min, max)
       renumber_block(v, v.min, v.max, move_offset)
     elseif v.status == inside_block then
       local move = blocks.minimal_others - max + move_offset
-      newmin, newmax = renumber_block(v, v.min, v.max, move)
+      local newmin, newmax = renumber_block(v, v.min, v.max, move)
       blocks.minimal_others = newmax + 1
     end
   end

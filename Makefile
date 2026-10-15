@@ -16,14 +16,18 @@ ifeq ($(strip $(shell git rev-parse --is-inside-work-tree 2>/dev/null)),true)
 endif
 
 
-all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua src/lua-uca/lua-uca-chinese.lua $(DOC_PDF)
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua src/lua-uca/lua-uca-implicit.lua src/lua-uca/lua-uca-chinese.lua $(DOC_PDF)
 
 
 
 data/allkeys.txt:
-	mkdir data
+	mkdir -p data
 	wget http://www.unicode.org/Public/UCA/latest/allkeys.txt
 	mv allkeys.txt data
+
+data/PropList.txt data/Blocks.txt:
+	mkdir -p data
+	wget -O $@ http://www.unicode.org/Public/UCD/latest/ucd/$(notdir $@)
 
 data/common:
 	wget http://unicode.org/Public/cldr/33/cldr-common-33.0.zip
@@ -40,6 +44,10 @@ src/lua-uca/lua-uca-ducet-jit.lua: src/lua-uca/lua-uca-ducet.lua
 src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt
 	mkdir -p src/lua-uca
 	texlua tools/make_reordering_table.lua > $@
+
+src/lua-uca/lua-uca-implicit.lua: data/allkeys.txt data/PropList.txt data/Blocks.txt
+	mkdir -p src/lua-uca
+	texlua tools/make_implicit.lua > $@
 
 .PHONY: test install
 
