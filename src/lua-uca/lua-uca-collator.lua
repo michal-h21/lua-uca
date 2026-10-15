@@ -339,6 +339,7 @@ function collator:make_sort_key(codepoints)
   local pos = 1
   local weights, remaining
   local sort_key = {}
+  local original = codepoints
   -- positions of the U+FFFE weights in the secondary level
   local separators = {}
   -- the number of levels in the collation elements
@@ -391,6 +392,21 @@ function collator:make_sort_key(codepoints)
     end
     -- zero separates levels in the sort key
     table.insert(sort_key, 0)
+  end
+  -- the identical level (UTS #10, S3.10): the NFD code points, shifted by 2
+  -- so that they are above the level separator, U+FFFE with the minimal
+  -- weight 1
+  if self.identical_level then
+    local nfd = original
+    if normalize_method ~= "NFD" and uni_normalize then
+      nfd = {}
+      for _, code in utf8.codes(uni_normalize.NFD(utf8.char(table.unpack(original)))) do
+        nfd[#nfd + 1] = code
+      end
+    end
+    for _, code in ipairs(nfd) do
+      table.insert(sort_key, code == 0xFFFE and 1 or code + 2)
+    end
   end
   return sort_key
 end

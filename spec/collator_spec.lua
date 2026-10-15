@@ -94,6 +94,17 @@ describe("collator test suite",function()
     assert.same(key("deluge"), key("de-luge"))
     assert.same(key("deluge"), key("de luge"))
   end)
+  it("identical level should work", function()
+    local c = collator.new(ducet)
+    -- U+0001 is ignorable, the sort keys are equal without the identical level
+    assert.same(c:make_sort_key({0x61}), c:make_sort_key({0x61, 0x01}))
+    c.identical_level = true
+    assert.truthy(c:compare(c:make_sort_key({0x61}), c:make_sort_key({0x61, 0x01})))
+    -- U+FFFE has the minimal weight on the identical level
+    assert.truthy(c:compare(c:make_sort_key({0x6C, 0xFFFE, 0x66}), c:make_sort_key({0x6C, 0x01, 0xFFFE, 0x66})))
+    -- canonical equivalents are still equal
+    assert.same(c:make_sort_key(c:string_to_codepoints("é")), c:make_sort_key(c:string_to_codepoints("e\u{301}")))
+  end)
   it("should make sort keys", function()
     local codepoints = {0x0FB2, 0x0F80, string.byte("a")}
     local sort_key = collator_obj:make_sort_key(codepoints)

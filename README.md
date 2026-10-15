@@ -117,6 +117,11 @@ they are sorted as the other characters (`"non-ignorable"`). Set the
 unless the strings are otherwise equal, so that "de luge", "de-luge" and
 "deluge" sort together, or to `"blanked"` to ignore them completely.
 
+Strings that differ only in ignorable characters, or only in variable
+characters with `"blanked"`, are equal for the collator. Set the
+`collator_obj.identical_level` variable to `true` to order them by their
+code points (in NFD) instead.
+
 
 % More information on a new language support is in the `HACKING.md`
 % document in the [`Lua-UCA` Github repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
