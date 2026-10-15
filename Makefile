@@ -18,16 +18,30 @@ endif
 
 all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua src/lua-uca/lua-uca-implicit.lua src/lua-uca/lua-uca-ccc.lua src/lua-uca/lua-uca-chinese.lua $(DOC_PDF)
 
-
+UCA_URL = https://www.unicode.org/Public/UCA/latest
+UCD_URL = https://www.unicode.org/Public/UCD/latest/ucd
+WGET = wget --no-use-server-timestamps
 
 data/allkeys.txt:
 	mkdir -p data
-	wget http://www.unicode.org/Public/UCA/latest/allkeys.txt
-	mv allkeys.txt data
+	$(WGET) -O $@.tmp $(UCA_URL)/allkeys.txt && mv $@.tmp $@
 
 data/PropList.txt data/Blocks.txt data/UnicodeData.txt:
 	mkdir -p data
-	wget -O $@ http://www.unicode.org/Public/UCD/latest/ucd/$(notdir $@)
+	$(WGET) -O $@.tmp $(UCD_URL)/$(notdir $@) && mv $@.tmp $@
+
+data/CollationTest:
+	mkdir -p data
+	$(WGET) -O data/CollationTest.zip $(UCA_URL)/CollationTest.zip
+	rm -rf $@
+	unzip -q data/CollationTest.zip -d data/
+	rm data/CollationTest.zip
+
+# download all the Unicode data again, for a new Unicode version
+fetch:
+	rm -f data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt
+	rm -rf data/CollationTest
+	$(MAKE) data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/CollationTest
 
 data/common:
 	wget http://unicode.org/Public/cldr/33/cldr-common-33.0.zip
@@ -53,7 +67,11 @@ src/lua-uca/lua-uca-ccc.lua: data/UnicodeData.txt
 	mkdir -p src/lua-uca
 	texlua tools/make_ccc.lua > $@
 
-.PHONY: test install
+.PHONY: test install conformance fetch
+
+conformance:
+	@test -d data/CollationTest || { echo "The conformance tests are missing, run make fetch"; exit 1; }
+	texlua tools/conformance.lua
 
 test:
 	luarocks make --local
