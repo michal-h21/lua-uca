@@ -12,14 +12,14 @@ local tailoring_lib = require "lua-uca.lua-uca-tailoring"
 describe("Test language support", function()
   local czech = collator.new(ducet)
   it("should  support language setting", function()
-    local ccaron = czech:string_to_codepoints("č")
-    -- save primary weight before language rules have been applied
-    local first = czech:get_weights(ccaron, 1)[1][1]
+    local c, ccaron = czech:string_to_codepoints("c"), czech:string_to_codepoints("č")
+    local primary = function(codepoints) return czech:get_weights(codepoints, 1)[1][1] end
+    -- č has the primary weight of c before language rules have been applied
+    assert.truthy(primary(c) == primary(ccaron))
     -- apply Czech rules
     languages.cs(czech)
-    -- primary weight with new rules
-    local second = czech:get_weights(ccaron, 1)[1][1]
-    assert.truthy(first < second)
+    -- č has its own primary weight with the new rules
+    assert.truthy(primary(c) < primary(ccaron))
   end)
   it("should support the tailoring dsl", function()
     -- test tailoring dsl

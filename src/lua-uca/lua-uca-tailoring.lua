@@ -20,119 +20,131 @@ local function binary_range_search(code_point, ranges)
   return nil, mid
 end
 
-local function get_range(block, blocks)
-  for _,v in ipairs(blocks) do
-    if v.name == block then return v.min, v.max end
-  end
-end
-
--- variables used for test whether the value lies inside range that should be moved
-local inside_block = 1
-local dont_move = 0 
-local move = -1
-
-local function get_search_table(min, max, max_value, blocks)
-  -- prepare table with ranges for search
-  local minimal_others = blocks.minimal_others
-  local lower_range = min < minimal_others and  min - 1 or minimal_others
-  -- construct search table
-  local search = {
-    {min, max, inside_block}, -- codes inside moved block
-    {0, lower_range, dont_move}, -- codes that will not move
-    {max + 1,  max_value, dont_move} -- codes above moved block
-  }
-  if min > minimal_others then -- codes need to be renumbered only when the code is moved back
-    table.insert(search, {minimal_others + 1, min -1, move}) -- codes that need to be renumbered
-  end
-  table.sort(search, function(a,b) return a[1] < b[1] end)
-  return search
-end
-
-local function clasify_blocks(blocks, search)
-  -- find whether block should be moved
-  for _, x in ipairs(blocks) do
-    local status, mid = binary_range_search(x.min, search)
-    local status_value = status[3]
-    x.status = status_value
-  end
-end
-
-local function renumber_block(block, min, max, move)
-  local newmin, newmax = min + move, max + move
-  block.move = (block.move or 0) + move
-  return newmin, newmax
-end
-
-local function renumber_blocks(blocks, min, max)
-  local move_offset = max - min + 1
-  for k,v in ipairs(blocks) do
-    -- set default value that will be used for the block moving
-    v.move = v.move or 0
-    if v.status == move then
-      renumber_block(v, v.min, v.max, move_offset)
-    elseif v.status == inside_block then
-      local move = blocks.minimal_others - max + move_offset
-      local newmin, newmax = renumber_block(v, v.min, v.max, move)
-      blocks.minimal_others = newmax + 1
+-- find the group of a script name or alias (ISO 15924 code etc.), in any case
+local function find_group(what, blocks)
+  local name = what:lower()
+  for i, v in ipairs(blocks) do
+    if v.name == name then return i end
+    for _, alias in ipairs(v.aliases or {}) do
+      if alias == name then return i end
     end
   end
 end
 
+-- names for all the groups that are not listed
+local others = {others = true, zzzz = true}
+-- groups that stay at the start when they are not listed
+local special = {digits = true}
+
+-- add a script to the reordering, as in CLDR (UTS #35): the listed groups
+-- come first, in the given order; the groups that are not listed come in
+-- their default order at the place of "others", or after the listed ones;
+-- the special groups (digits) that are not listed stay at the start
 local function reorder(what, blocks)
-  local min, max = get_range(what, blocks)
-  local max_value = blocks[#blocks].max -- find maximal value in blocks
-  if what == "others" or what == "Zzzz" then 
-    -- when reordering others, don't move anything, just set the
-    -- minimal_others to the maximal value, so the next reordering will move 
-    -- the reordered block behind all others
-    blocks.minimal_others = max_value + 1
-    return 
+  blocks.order = blocks.order or {}
+  if others[what:lower()] then
+    table.insert(blocks.order, "others")
+    return blocks
   end
-  if not min then return nil, "Cannot find block for reordering" end
-  local search = get_search_table(min, max, max_value, blocks)
-  clasify_blocks(blocks, search)
-  renumber_blocks(blocks, min, max)
+  local index = find_group(what, blocks)
+  if not index then return nil, "Cannot find block for reordering" end
+  table.insert(blocks.order, index)
   return blocks
 end
 
+-- the new place of each group: {min, max, move}, sorted by min
+local function make_moves(blocks)
+  local listed, seen, has_others = {}, {}, false
+  for _, item in ipairs(blocks.order or {}) do
+    if item == "others" then
+      if not has_others then listed[#listed + 1] = "others" end
+      has_others = true
+    elseif not seen[item] then
+      seen[item] = true
+      listed[#listed + 1] = item
+    end
+  end
+  local unlisted = {}
+  local sequence = {}
+  for i, block in ipairs(blocks) do
+    if not seen[i] then
+      if special[block.name] then
+        sequence[#sequence + 1] = i
+      else
+        unlisted[#unlisted + 1] = i
+      end
+    end
+  end
+  if not has_others then listed[#listed + 1] = "others" end
+  for _, item in ipairs(listed) do
+    if item == "others" then
+      for _, i in ipairs(unlisted) do sequence[#sequence + 1] = i end
+    else
+      sequence[#sequence + 1] = item
+    end
+  end
+  -- the groups get consecutive weights from the lowest one
+  local position = blocks[1].min
+  local moves = {}
+  for _, i in ipairs(sequence) do
+    local block = blocks[i]
+    moves[#moves + 1] = {block.min, block.max, position - block.min}
+    position = position + block.max - block.min + 1
+  end
+  table.sort(moves, function(x, y) return x[1] < y[1] end)
+  return moves
+end
+
+-- the reordered primary weight
+local function move_primary(weight, moves)
+  local range = binary_range_search(weight, moves)
+  return range and weight + range[3] or weight
+end
+
+-- the primary weights of implicit weights start a pair of collation
+-- elements; the second one is not a primary weight of a group
+local function is_implicit_lead(weight)
+  return weight >= 0xFB00 and weight <= 0xFBFF
+end
+
 local function reorder_collator(collator, blocks)
-  local function prepare_search_table(blocks)
-    -- make search table for collator weights
-    -- initialize it with block that contain all values bellow the minimal block
-    local search = {{0, blocks[1].min - 1, 0}}
-    for _, block in ipairs(blocks) do
-      -- return move value for each script block
-      local t = {block.min, block.max, block.move}
-      search[#search+1] = t
+  local moves = make_moves(blocks)
+  -- the weights moved by a previous reordering are moved back first: the
+  -- previous moves at their new places
+  local undo
+  if collator.reorder_moves then
+    undo = {}
+    for _, move in ipairs(collator.reorder_moves) do
+      undo[#undo + 1] = {move[1] + move[3], move[2] + move[3], -move[3]}
     end
-    return search
+    table.sort(undo, function(x, y) return x[1] < y[1] end)
   end
-  local function update_value(value, search) 
-    -- find the move offset for the primary weight in the reordering table
-    local first = value[1][1]
-    local status = binary_range_search(first, search) or {}
-    local move = status[3] or 0
-    if move ~= 0 then 
-      -- detect if we need to recalculate the primary weight
-      value[1][1] = first + move
-    end
-    return value
-  end
-  local function update_weights(entry, search)
-    -- recursivelly process weighgs for the current codepoint
-    if entry.value then
-      entry.value = update_value(entry.value, search)
-    end
-    if entry.children then
-      update_weights(entry.children, search)
+  local function update_value(value)
+    local continuation = false
+    for _, element in ipairs(value) do
+      local weight = element[1]
+      if undo then weight = move_primary(weight, undo) end
+      if not continuation and weight ~= 0 then
+        element[1] = move_primary(weight, moves)
+      else
+        element[1] = weight
+      end
+      continuation = is_implicit_lead(weight)
     end
   end
-  local search = prepare_search_table(blocks)
+  local function update_weights(entry)
+    if entry.value then update_value(entry.value) end
+    for _, child in pairs(entry.children or {}) do
+      update_weights(child)
+    end
+  end
   for _, current in pairs(collator.codes) do
-    update_weights(current, search)
+    update_weights(current)
   end
-  -- clear sortkey cache
+  collator.reorder_moves = moves
+  -- clear the caches
   collator.stringcache = {}
+  collator.weight_to_char = nil
 end
 
 -----------------------
@@ -186,6 +198,7 @@ local M = {}
 
 M.reorder = reorder
 M.reorder_collator = reorder_collator
+M.move_primary = move_primary
 M.tailor_string = tailor_string
 return M
 

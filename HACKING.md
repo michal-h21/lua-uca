@@ -13,6 +13,18 @@ using Make:
 
     make
 
+The data files are downloaded only once, to the `data/` directory. To
+download all of them again, for example for a new Unicode version, and then
+regenerate the Lua files, run:
+
+    make fetch
+    make
+
+To run the conformance tests of the Unicode Collation Algorithm (they are
+downloaded by `make fetch`), run:
+
+    make conformance
+
 To install the package in the local TEXMF tree, run:
 
     make install

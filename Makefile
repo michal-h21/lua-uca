@@ -26,7 +26,7 @@ data/allkeys.txt:
 	mkdir -p data
 	$(WGET) -O $@.tmp $(UCA_URL)/allkeys.txt && mv $@.tmp $@
 
-data/PropList.txt data/Blocks.txt data/UnicodeData.txt:
+data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt:
 	mkdir -p data
 	$(WGET) -O $@.tmp $(UCD_URL)/$(notdir $@) && mv $@.tmp $@
 
@@ -39,9 +39,9 @@ data/CollationTest:
 
 # download all the Unicode data again, for a new Unicode version
 fetch:
-	rm -f data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt
+	rm -f data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt
 	rm -rf data/CollationTest
-	$(MAKE) data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/CollationTest
+	$(MAKE) data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt data/CollationTest
 
 data/common:
 	wget http://unicode.org/Public/cldr/33/cldr-common-33.0.zip
@@ -55,7 +55,7 @@ src/lua-uca/lua-uca-ducet.lua: data/allkeys.txt
 src/lua-uca/lua-uca-ducet-jit.lua: src/lua-uca/lua-uca-ducet.lua
 	texlua tools/make_ducet_jit.lua > src/lua-uca/lua-uca-ducet-jit.lua
 
-src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt
+src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt data/Scripts.txt data/PropertyValueAliases.txt data/UnicodeData.txt data/PropList.txt
 	mkdir -p src/lua-uca
 	texlua tools/make_reordering_table.lua > $@
 

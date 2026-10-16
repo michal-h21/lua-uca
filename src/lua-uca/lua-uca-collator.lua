@@ -141,6 +141,10 @@ function collator:get_implicit_weight(codepoints, pos)
     end
     first, second = base + (codepoint >> 15), (codepoint & 0x7FFF) | 0x8000
   end
+  -- the implicit weights are moved with their script by reordering
+  if self.reorder_moves then
+    first = tailoring_lib.move_primary(first, self.reorder_moves)
+  end
   return {{first, 0x20, 0x02}, {second, 0, 0}}, pos + 1
 end
 

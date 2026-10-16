@@ -141,8 +141,15 @@ In German or Czech, numbers should be sorted after all other characters. This ca
 
     collator_obj:reorder {"others", "digits"}
 
-The special keyword "others" means that the scripts that follows in the table
-will be sorted at the very end.
+The listed scripts are sorted first, in the given order, and the scripts that
+are not listed follow in their default order. The special keyword "others"
+stands for the scripts that are not listed, so the scripts after it are
+sorted at the very end. Digits stay before the letters unless they are
+listed.
+
+Scripts are given by their English names in lowercase, such as "cyrillic",
+"greek" or "han", or by their ISO 15924 codes, such as "Cyrl", "Grek" or
+"Hani". Hiragana and Katakana are one script ("kana").
 
 ## Headers for index entries
 
