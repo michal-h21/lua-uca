@@ -12,8 +12,24 @@ describe("collator test suite",function()
     local weight, pos = collator:get_implicit_weight({2222}, 1)
     assert.truthy(weight)
     assert.truthy(type(weight) == "table")
-    assert.truthy(weight[1][1] == 2222)
+    assert.same({{0xFBC0, 0x20, 0x02}, {0x88AE, 0, 0}}, weight)
     assert.truthy(pos==2)
+    -- core Han, other Han, Tangut
+    assert.same({{0xFB40, 0x20, 0x02}, {0xCE00, 0, 0}}, collator:get_implicit_weight({0x4E00}, 1))
+    assert.same({{0xFB80, 0x20, 0x02}, {0xB400, 0, 0}}, collator:get_implicit_weight({0x3400}, 1))
+    assert.same({{0xFB84, 0x20, 0x02}, {0x8000, 0, 0}}, collator:get_implicit_weight({0x20000}, 1))
+    assert.same({{0xFB00, 0x20, 0x02}, {0x8000, 0, 0}}, collator:get_implicit_weight({0x17000}, 1))
+  end)
+  it("implicit weights should sort Han after the explicit weights", function()
+    -- cuneiform U+12034 has the highest explicit primary weights
+    -- the Kangxi radical U+2F00 has explicit weights, a tertiary variant of U+4E00
+    local a = collator_obj:make_sort_key({0x12034})
+    local b = collator_obj:make_sort_key({0x2F00})
+    local c = collator_obj:make_sort_key({0x4E00})
+    local d = collator_obj:make_sort_key({0x4E01})
+    assert.truthy(collator_obj:compare(a, c))
+    assert.truthy(collator_obj:compare(c, b))
+    assert.truthy(collator_obj:compare(b, d))
   end)
   it("contractions should work", function()
     -- non-sense codepoint
@@ -25,6 +41,69 @@ describe("collator test suite",function()
     -- it should read 
     assert.truthy(pos == 3)
 
+  end)
+  it("discontiguous contractions should work", function()
+    -- alef + madda above (U+0653) is a contraction, U+0591 (class 220)
+    -- between them doesn't block it
+    local contraction = collator_obj:make_sort_key({0x0627, 0x0653, 0x0591})
+    assert.same(contraction, collator_obj:make_sort_key({0x0627, 0x0591, 0x0653}))
+    -- U+0592 has the same class as U+0653 (230) and blocks it
+    local blocked = collator_obj:make_sort_key({0x0627, 0x0592, 0x0653})
+    local unblocked = collator_obj:make_sort_key({0x0627, 0x0653, 0x0592})
+    assert.truthy(collator_obj:compare(blocked, unblocked) or collator_obj:compare(unblocked, blocked))
+  end)
+  it("backward secondary weights should be reversed in segments", function()
+    local backward = collator.new(ducet)
+    backward.accents_backward = true
+    -- the secondary level of the sort key, between the first two zeroes
+    local function secondary(codepoints)
+      local key = backward:make_sort_key(codepoints)
+      local level, zeroes = {}, 0
+      for _, weight in ipairs(key) do
+        if weight == 0 then
+          zeroes = zeroes + 1
+          if zeroes == 2 then break end
+        elseif zeroes == 1 then
+          level[#level + 1] = weight
+        end
+      end
+      return level
+    end
+    local function weight(codepoint) return backward:get_weights({codepoint}, 1)[1][2] end
+    -- a, acute, U+FFFE, b: the segment before U+FFFE is reversed alone
+    assert.same({weight(0x0301), weight(0x61), weight(0xFFFE), weight(0x62)},
+      secondary({0x61, 0x0301, 0xFFFE, 0x62}))
+    -- without U+FFFE the whole level is reversed
+    assert.same({weight(0x62), weight(0x0301), weight(0x61)}, secondary({0x61, 0x0301, 0x62}))
+  end)
+  it("variable weighting should work", function()
+    local function sorted(variable)
+      local c = collator.new(ducet)
+      c.variable_weighting = variable
+      local t = {"deluge", "de-luge", "demark", "de luge", "death"}
+      table.sort(t, function(a, b) return c:compare_strings(a, b) end)
+      return t, c
+    end
+    assert.same({"de luge", "de-luge", "death", "deluge", "demark"}, sorted("non-ignorable"))
+    assert.same({"de luge", "de-luge", "death", "deluge", "demark"}, sorted(nil))
+    -- shifted: space and hyphen are ignored up to the quaternary level
+    assert.same({"death", "de luge", "de-luge", "deluge", "demark"}, sorted("shifted"))
+    -- blanked: they are ignored
+    local _, blanked = sorted("blanked")
+    local key = function(s) return blanked:make_sort_key(blanked:string_to_codepoints(s)) end
+    assert.same(key("deluge"), key("de-luge"))
+    assert.same(key("deluge"), key("de luge"))
+  end)
+  it("identical level should work", function()
+    local c = collator.new(ducet)
+    -- U+0001 is ignorable, the sort keys are equal without the identical level
+    assert.same(c:make_sort_key({0x61}), c:make_sort_key({0x61, 0x01}))
+    c.identical_level = true
+    assert.truthy(c:compare(c:make_sort_key({0x61}), c:make_sort_key({0x61, 0x01})))
+    -- U+FFFE has the minimal weight on the identical level
+    assert.truthy(c:compare(c:make_sort_key({0x6C, 0xFFFE, 0x66}), c:make_sort_key({0x6C, 0x01, 0xFFFE, 0x66})))
+    -- canonical equivalents are still equal
+    assert.same(c:make_sort_key(c:string_to_codepoints("é")), c:make_sort_key(c:string_to_codepoints("e\u{301}")))
   end)
   it("should make sort keys", function()
     local codepoints = {0x0FB2, 0x0F80, string.byte("a")}

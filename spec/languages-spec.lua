@@ -12,24 +12,22 @@ local tailoring_lib = require "lua-uca.lua-uca-tailoring"
 describe("Test language support", function()
   local czech = collator.new(ducet)
   it("should  support language setting", function()
-    ccaron = utf8.codepoint("č") 
-    local cweight = czech.codes[ccaron]
-    -- save primary weight before language rules have been applied
-    local first =  cweight.value[1][1]
+    local c, ccaron = czech:string_to_codepoints("c"), czech:string_to_codepoints("č")
+    local primary = function(codepoints) return czech:get_weights(codepoints, 1)[1][1] end
+    -- č has the primary weight of c before language rules have been applied
+    assert.truthy(primary(c) == primary(ccaron))
     -- apply Czech rules
     languages.cs(czech)
-    local cweight = czech.codes[ccaron]
-    -- primary weight with new rules
-    local second = cweight.value[1][1]
-    assert.truthy(first < second)
+    -- č has its own primary weight with the new rules
+    assert.truthy(primary(c) < primary(ccaron))
   end)
   it("should support the tailoring dsl", function()
     -- test tailoring dsl
     --
     tailoring_lib.tailor_string(czech,"&z<ž")
-    local z, zcaron = utf8.codepoint("z"), utf8.codepoint("ž")
-    local zweight, zcaronweight = czech.codes[z], czech.codes[zcaron]
-    assert.truthy(zcaronweight.value[1][1] - zweight.value[1][1] == 1)
+    local zweight = czech:get_weights(czech:string_to_codepoints("z"), 1)
+    local zcaronweight = czech:get_weights(czech:string_to_codepoints("ž"), 1)
+    assert.truthy(zcaronweight[1][1] - zweight[1][1] == 1)
   end)
   it("should find codepoints from weight", function()
     local codepoints = czech:string_to_codepoints("Chrobák")

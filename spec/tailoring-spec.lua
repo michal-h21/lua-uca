@@ -48,4 +48,20 @@ describe("Test reordering", function()
     table.sort(sort_table, function(a,b) return newcollator:compare_strings(a,b) end) 
     assert_order(sort_table, {"ahoj",  "Первая", "12"})
   end)
+  it("should reorder several scripts", function()
+    local words = {"abc", "Привет", "αβγ", "123", "אבג", "漢字"}
+    local sorted = function(scripts)
+      local c = collator_lib.new(ducet)
+      c:reorder(scripts)
+      local t = {table.unpack(words)}
+      table.sort(t, function(a,b) return c:compare_strings(a,b) end)
+      return t
+    end
+    -- the listed scripts first, then the others in the default order
+    assert.same({"123", "αβγ", "Привет", "abc", "אבג", "漢字"}, sorted {"greek", "cyrillic"})
+    -- ISO 15924 codes, others in the middle; Han has implicit weights
+    assert.same({"123", "漢字", "abc", "αβγ", "Привет", "אבג"}, sorted {"Hani", "others", "Hebr"})
+    -- digits listed
+    assert.same({"Привет", "abc", "αβγ", "אבג", "漢字", "123"}, sorted {"Cyrl", "others", "digits"})
+  end)
 end)

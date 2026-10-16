@@ -22,6 +22,8 @@ build = {
       ["lua-uca.languages"] = "src/lua-uca/lua-uca-languages.lua",
       ["lua-uca.chinese"] = "src/lua-uca/lua-uca-chinese.lua",
       ["lua-uca.reordering-table"] = "src/lua-uca/lua-uca-reordering-table.lua",
+      ["lua-uca.implicit"] = "src/lua-uca/lua-uca-implicit.lua",
+      ["lua-uca.ccc"] = "src/lua-uca/lua-uca-ccc.lua",
       ["lua-uca.tailoring"] = "src/lua-uca/lua-uca-tailoring.lua"
    }
 }

@@ -7,6 +7,8 @@ It is mainly intended for use with Lua\TeX and working \TeX\ distribution, but i
 Lua module. You will need to install a required [Lua-uni-algos](https://github.com/latex3/lua-uni-algos) package by hand
 in that case.
 
+It conforms to the Unicode Collation Algorithm version 18.0.0.
+
 
 ## Usage
 
@@ -109,6 +111,17 @@ can be enabled using `collator_obj:uppercase_first()` function:
 Some languages, for example Canadian French, sort accent backwards, like gêne < gëne < gêné. 
 In this case, you can set the `collator_obj.accents_backward` variable to `true`.
 
+Spaces, punctuation and most symbols are variable characters. By default,
+they are sorted as the other characters (`"non-ignorable"`). Set the
+`collator_obj.variable_weighting` variable to `"shifted"` to ignore them,
+unless the strings are otherwise equal, so that "de luge", "de-luge" and
+"deluge" sort together, or to `"blanked"` to ignore them completely.
+
+Strings that differ only in ignorable characters, or only in variable
+characters with `"blanked"`, are equal for the collator. Set the
+`collator_obj.identical_level` variable to `true` to order them by their
+code points (in NFD) instead.
+
 
 % More information on a new language support is in the `HACKING.md`
 % document in the [`Lua-UCA` Github repo](https://github.com/michal-h21/lua-uca/blob/master/HACKING.md).
@@ -128,8 +141,15 @@ In German or Czech, numbers should be sorted after all other characters. This ca
 
     collator_obj:reorder {"others", "digits"}
 
-The special keyword "others" means that the scripts that follows in the table
-will be sorted at the very end.
+The listed scripts are sorted first, in the given order, and the scripts that
+are not listed follow in their default order. The special keyword "others"
+stands for the scripts that are not listed, so the scripts after it are
+sorted at the very end. Digits stay before the letters unless they are
+listed.
+
+Scripts are given by their English names in lowercase, such as "cyrillic",
+"greek" or "han", or by their ISO 15924 codes, such as "Cyrl", "Grek" or
+"Hani". Hiragana and Katakana are one script ("kana").
 
 ## Headers for index entries
 
@@ -138,6 +158,7 @@ character. This is the case of the *ch* character.
 
 Lua-UCA provides function `collator_obj:get_lowest_char()`. It returns table with UTF-8 codepoints 
 for correct first character for a given language that can be used for example as an index header.
+When normalization is used, the characters are returned in NFC.
 
 
     local czech = collator.new(ducet)
@@ -155,12 +176,13 @@ for correct first character for a given language that can be used for example as
 
 ## Unicode normalization
 
-By default, no Unicode normalization is used internally. You can explicitly request normalization that use the
-[Uninormalize package](https://ctan.org/pkg/uninormalize?lang=en). Note that it will significantly increase the
-procesing time. 
+Strings are normalized to NFD before collation, as the Unicode Collation
+Algorithm requires, using the `lua-uni-normalize` library from the
+[lua-uni-algos package](https://ctan.org/pkg/lua-uni-algos). It is loaded
+in LuaTeX; with stock Lua, no normalization is used.
 
-There are two normalization methods, NFC and NFD. They can be enabled using
-`collation.use_nfc()` and `collation.use_nfd()` functions.
+The normalization method can be changed using the `collation.use_nfc()` and
+`collation.use_nfd()` functions.
 
 
 # What is missing

@@ -16,14 +16,32 @@ ifeq ($(strip $(shell git rev-parse --is-inside-work-tree 2>/dev/null)),true)
 endif
 
 
-all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua src/lua-uca/lua-uca-chinese.lua $(DOC_PDF)
+all: data/allkeys.txt data/common src/lua-uca/lua-uca-ducet.lua src/lua-uca/lua-uca-ducet-jit.lua src/lua-uca/lua-uca-reordering-table.lua src/lua-uca/lua-uca-implicit.lua src/lua-uca/lua-uca-ccc.lua src/lua-uca/lua-uca-chinese.lua $(DOC_PDF)
 
-
+UCA_URL = https://www.unicode.org/Public/UCA/latest
+UCD_URL = https://www.unicode.org/Public/UCD/latest/ucd
+WGET = wget --no-use-server-timestamps
 
 data/allkeys.txt:
-	mkdir data
-	wget http://www.unicode.org/Public/UCA/latest/allkeys.txt
-	mv allkeys.txt data
+	mkdir -p data
+	$(WGET) -O $@.tmp $(UCA_URL)/allkeys.txt && mv $@.tmp $@
+
+data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt:
+	mkdir -p data
+	$(WGET) -O $@.tmp $(UCD_URL)/$(notdir $@) && mv $@.tmp $@
+
+data/CollationTest:
+	mkdir -p data
+	$(WGET) -O data/CollationTest.zip $(UCA_URL)/CollationTest.zip
+	rm -rf $@
+	unzip -q data/CollationTest.zip -d data/
+	rm data/CollationTest.zip
+
+# download all the Unicode data again, for a new Unicode version
+fetch:
+	rm -f data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt
+	rm -rf data/CollationTest
+	$(MAKE) data/allkeys.txt data/PropList.txt data/Blocks.txt data/UnicodeData.txt data/Scripts.txt data/PropertyValueAliases.txt data/CollationTest
 
 data/common:
 	wget http://unicode.org/Public/cldr/33/cldr-common-33.0.zip
@@ -37,11 +55,23 @@ src/lua-uca/lua-uca-ducet.lua: data/allkeys.txt
 src/lua-uca/lua-uca-ducet-jit.lua: src/lua-uca/lua-uca-ducet.lua
 	texlua tools/make_ducet_jit.lua > src/lua-uca/lua-uca-ducet-jit.lua
 
-src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt
+src/lua-uca/lua-uca-reordering-table.lua: data/allkeys.txt data/Scripts.txt data/PropertyValueAliases.txt data/UnicodeData.txt data/PropList.txt
 	mkdir -p src/lua-uca
 	texlua tools/make_reordering_table.lua > $@
 
-.PHONY: test install
+src/lua-uca/lua-uca-implicit.lua: data/allkeys.txt data/PropList.txt data/Blocks.txt
+	mkdir -p src/lua-uca
+	texlua tools/make_implicit.lua > $@
+
+src/lua-uca/lua-uca-ccc.lua: data/UnicodeData.txt
+	mkdir -p src/lua-uca
+	texlua tools/make_ccc.lua > $@
+
+.PHONY: test install conformance fetch
+
+conformance:
+	@test -d data/CollationTest || { echo "The conformance tests are missing, run make fetch"; exit 1; }
+	texlua tools/conformance.lua
 
 test:
 	luarocks make --local
